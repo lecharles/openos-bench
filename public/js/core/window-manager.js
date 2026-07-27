@@ -34,6 +34,7 @@ const WindowManager = {
     this.focus(win);
     this._debouncedSave();
     Dock.setRunning(appId, true);
+    Dock.bounce(appId);
     return win;
   },
 
@@ -205,7 +206,28 @@ const WindowManager = {
   },
 
   minimize(winObj) {
-    winObj.el.classList.add('minimized');
+    const el = winObj.el;
+    // Genie-style: animate the window down into its dock icon
+    const dockItem = document.querySelector(`.dock-item[data-app="${winObj.appId}"]`);
+    if (dockItem && !el.classList.contains('minimized')) {
+      const r = dockItem.getBoundingClientRect();
+      const wr = el.getBoundingClientRect();
+      const dx = (r.left + r.width / 2) - (wr.left + wr.width / 2);
+      const dy = (r.top + r.height / 2) - (wr.top + wr.height / 2);
+      el.style.transition = 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1)';
+      el.style.transform = `translate(${dx}px, ${dy}px) scale(0.06)`;
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      setTimeout(() => {
+        el.classList.add('minimized');
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+      }, 300);
+    } else {
+      el.classList.add('minimized');
+    }
     if (this.focusedWindow === winObj) {
       this.focusedWindow = null;
       document.getElementById('active-app-menu').textContent = '';

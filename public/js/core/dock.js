@@ -1,4 +1,4 @@
-// Dock - handles dock clicks, running indicators, and magnification
+// Dock - handles dock clicks, running indicators, magnification, launch bounce
 const Dock = {
   runningApps: {},
   items: [],
@@ -24,6 +24,19 @@ const Dock = {
     WindowManager.open(appId, AppRegistry.getTitle(appId));
   },
 
+  // macOS-style bounce when an app launches or needs attention
+  bounce(appId) {
+    const item = this._dockEl?.querySelector(`.dock-item[data-app="${appId}"]`);
+    if (!item) return;
+    const icon = item.querySelector('.dock-icon');
+    if (!icon) return;
+    icon.classList.remove('dock-bounce');
+    // Force reflow so the animation restarts on repeated launches
+    void icon.offsetWidth;
+    icon.classList.add('dock-bounce');
+    setTimeout(() => icon.classList.remove('dock-bounce'), 900);
+  },
+
   setupMagnification() {
     const container = this._containerEl;
 
@@ -46,29 +59,23 @@ const Dock = {
     this._rafId = null;
     const items = this._dockItems;
     const mouseX = this._mouseX;
-    const maxDist = 120;
+    const maxDist = 110;
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const rect = item.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const dist = Math.abs(mouseX - centerX);
+      const icon = item.querySelector('.dock-icon');
 
       if (dist < maxDist && mouseX >= 0) {
-        const t = 1 - (dist / maxDist);
-        const scale = 1 + t * 0.25;
-        const width = 52 + t * 24;
-        item.style.width = width + 'px';
-        const icon = item.querySelector('.dock-icon');
-        if (icon) icon.style.transform = `scale(${scale})`;
-        const label = item.querySelector('.dock-label');
-        if (label) label.style.opacity = t > 0.5 ? '1' : '0';
+        // Cosine falloff — smooth, macOS-like growth curve
+        const t = (1 + Math.cos(Math.PI * dist / maxDist)) / 2;
+        item.style.width = (52 + t * 26) + 'px';
+        if (icon) icon.style.transform = `scale(${1 + t * 0.62})`;
       } else {
         item.style.width = '';
-        const icon = item.querySelector('.dock-icon');
         if (icon) icon.style.transform = 'scale(1)';
-        const label = item.querySelector('.dock-label');
-        if (label) label.style.opacity = '0';
       }
     }
   },
@@ -78,11 +85,9 @@ const Dock = {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       item.style.width = '';
-      item.style.transition = 'width 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)';
+      item.style.transition = 'width 280ms cubic-bezier(0.17, 0.67, 0.35, 1.17)';
       const icon = item.querySelector('.dock-icon');
-      if (icon) { icon.style.transition = 'transform 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)'; icon.style.transform = 'scale(1)'; }
-      const label = item.querySelector('.dock-label');
-      if (label) label.style.opacity = '0';
+      if (icon) { icon.style.transition = 'transform 280ms cubic-bezier(0.17, 0.67, 0.35, 1.17)'; icon.style.transform = 'scale(1)'; }
     }
     setTimeout(() => {
       for (let i = 0; i < items.length; i++) {
@@ -90,7 +95,7 @@ const Dock = {
         const icon = items[i].querySelector('.dock-icon');
         if (icon) icon.style.transition = '';
       }
-    }, 310);
+    }, 290);
   },
 
   setRunning(appId, running) {
