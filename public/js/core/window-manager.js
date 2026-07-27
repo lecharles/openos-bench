@@ -80,12 +80,13 @@ const WindowManager = {
     el.appendChild(content);
     this.container.appendChild(el);
 
+    const winObj = { el, content, appId, title, maximized: false, opts };
+    el._winObj = winObj;
+
     // Setup interactions
     this.setupDrag(el, tb);
     this.setupResize(el);
     this.setupButtons(el, tb);
-
-    const winObj = { el, content, appId, title, maximized: false, opts };
 
     // Focus on click
     el.addEventListener('mousedown', () => this.focus(winObj));
