@@ -47,6 +47,15 @@ window.AppPreview = {
   },
 
   async showPlaceholder(body, path, name) {
+    // Images render directly via the raw file endpoint
+    if (['png','jpg','jpeg','gif','webp','bmp','ico'].includes((name.split('.').pop() || '').toLowerCase())) {
+      body.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;flex:1;min-height:200px;padding:16px;">
+          <img src="/api/fs/raw?file=${encodeURIComponent(path)}" alt="${AppUtils.escapeHtml(name)}"
+               style="max-width:100%;max-height:100%;border-radius:8px;box-shadow:var(--elevation-3);">
+        </div>`;
+      return;
+    }
     // Look up file size from the parent directory listing
     let sizeStr = '';
     try {

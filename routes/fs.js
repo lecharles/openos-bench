@@ -46,13 +46,18 @@ function fsRoutes(router) {
       const entries = await fs.readdir(dir, { withFileTypes: true });
       const mapped = await Promise.all(entries.map(async (e) => {
         const fullPath = path.join(dir, e.name);
-        let size = 0;
-        if (e.isFile()) {
-          try { const st = await fs.stat(fullPath); size = st.size; } catch {}
-        }
-        return { name: e.name, type: e.isDirectory() ? 'directory' : 'file', size };
+        let size = 0, mtime = null;
+        try {
+          const st = await fs.stat(fullPath);
+          if (e.isFile()) size = st.size;
+          mtime = st.mtime.toISOString();
+        } catch {}
+        return { name: e.name, type: e.isDirectory() ? 'directory' : 'file', size, mtime };
       }));
-      res.json({ path: dir, entries: mapped });
+      // Free disk space for the Finder status bar (graceful null if unsupported)
+      let free = null;
+      try { const sfs = await fs.statfs(dir); free = sfs.bavail * sfs.bsize; } catch {}
+      res.json({ path: dir, entries: mapped, free });
     } catch (e) {
       res.status(400).json({ error: e.message });
     }
@@ -86,6 +91,47 @@ function fsRoutes(router) {
 
       await fs.writeFile(fp, content, 'utf8');
       res.json({ ok: true });
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
+  });
+
+  // Rename a file or folder (Finder inline rename)
+  router.post('/api/fs/rename', async (req, res) => {
+    try {
+      const { path: fp, newName } = req.body;
+      if (!fp || !newName) return res.status(400).json({ error: 'Missing path or newName' });
+      if (newName.includes('/') || newName.includes('\\') || newName === '.' || newName === '..') {
+        return res.status(400).json({ error: 'Invalid name' });
+      }
+      if (!isPathSafe(fp)) return res.status(403).json({ error: 'Access denied' });
+      const target = path.join(path.dirname(fp), newName);
+      if (!isPathSafe(target)) return res.status(403).json({ error: 'Access denied' });
+      await fs.rename(fp, target);
+      res.json({ ok: true, path: target });
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
+  });
+
+  // Serve raw file bytes (image thumbnails/previews in Finder)
+  router.get('/api/fs/raw', async (req, res) => {
+    try {
+      const fp = req.query.file;
+      if (!fp) return res.status(400).json({ error: 'No file specified' });
+      if (!isPathSafe(fp)) return res.status(403).json({ error: 'Access denied' });
+      const stat = await fs.stat(fp);
+      if (!stat.isFile()) return res.status(400).json({ error: 'Not a file' });
+      if (stat.size > 20 * 1024 * 1024) return res.status(400).json({ error: 'File too large (>20MB)' });
+      const ext = path.extname(fp).toLowerCase();
+      const mime = {
+        '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+        '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.bmp': 'image/bmp',
+        '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.mp4': 'video/mp4', '.pdf': 'application/pdf',
+      }[ext] || 'application/octet-stream';
+      res.setHeader('Content-Type', mime);
+      res.setHeader('Cache-Control', 'no-cache');
+      res.sendFile(path.resolve(fp));
     } catch (e) {
       res.status(400).json({ error: e.message });
     }

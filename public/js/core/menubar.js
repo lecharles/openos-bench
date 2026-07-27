@@ -45,6 +45,8 @@ const MenuBar = {
       ['Select All', () => document.execCommand('selectAll')],
     ],
     view: [
+      ['Show / Hide Path Bar', () => window.dispatchEvent(new CustomEvent('kbd:toggle-pathbar'))],
+      '-',
       ['Toggle Dark Mode', async () => {
         const s = await Persistence.getSettings();
         const cur = document.documentElement.getAttribute('data-theme');
