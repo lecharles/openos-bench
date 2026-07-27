@@ -1,5 +1,5 @@
 // Contacts app
-const AppContacts = {
+window.AppContacts = {
   contacts: [],
 
   async render(container) {
@@ -19,12 +19,22 @@ const AppContacts = {
       <div id="contacts-editor" style="display:none;"></div>
     `;
 
-    this.renderList(container);
     this.setupListeners(container);
+    this.renderList(container);
   },
 
   async loadContacts() {
-    try { const r = await fetch('/api/contacts'); this.contacts = await r.json(); } catch { this.contacts = []; }
+    try {
+      const r = await fetch('/api/contacts');
+      const data = await r.json();
+      // Ensure every contact has a stable id (used instead of array indexes)
+      this.contacts = (Array.isArray(data) ? data : []).map(c => ({
+        id: c.id || Date.now().toString() + Math.random().toString(36).slice(2, 8),
+        name: c.name || '',
+        phone: c.phone || '',
+        email: c.email || '',
+      }));
+    } catch { this.contacts = []; }
   },
 
   async saveContacts() {
@@ -33,10 +43,10 @@ const AppContacts = {
 
   seedContacts() {
     this.contacts = [
-      { name: 'Alice Chen', phone: '555-0101', email: 'alice@example.com' },
-      { name: 'Bob Smith', phone: '555-0102', email: 'bob@example.com' },
-      { name: 'Carol Davis', phone: '555-0103', email: 'carol@example.com' },
-      { name: 'Dave Wilson', phone: '555-0104', email: 'dave@example.com' },
+      { id: 'alice', name: 'Alice Chen', phone: '555-0101', email: 'alice@example.com' },
+      { id: 'bob', name: 'Bob Smith', phone: '555-0102', email: 'bob@example.com' },
+      { id: 'carol', name: 'Carol Davis', phone: '555-0103', email: 'carol@example.com' },
+      { id: 'dave', name: 'Dave Wilson', phone: '555-0104', email: 'dave@example.com' },
     ];
     this.saveContacts();
   },
@@ -44,8 +54,8 @@ const AppContacts = {
   renderList(container, filter = '') {
     const list = container.querySelector('#contacts-list');
     const filtered = filter ? this.contacts.filter(c => c.name.toLowerCase().includes(filter.toLowerCase())) : this.contacts;
-    list.innerHTML = filtered.map((c, i) => `
-      <div class="app-list-item contacts-item" data-index="${i}" style="padding:10px var(--space-3);">
+    list.innerHTML = filtered.map(c => `
+      <div class="app-list-item contacts-item" data-id="${AppUtils.escapeHtml(c.id)}" style="padding:10px var(--space-3);">
         <span style="font-size:28px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">👤</span>
         <div>
           <div style="font-weight:var(--weight-medium);">${AppUtils.escapeHtml(c.name)}</div>
@@ -53,27 +63,30 @@ const AppContacts = {
         </div>
       </div>
     `).join('');
-  },
 
-  setupListeners(container) {
-    container.querySelector('#contacts-add').addEventListener('click', () => this.showEditor(container, null));
-    container.querySelector('#contacts-search').addEventListener('input', (e) => this.renderList(container, e.target.value));
-
-    container.querySelectorAll('.contacts-item').forEach(el => {
+    // Per-item listeners bind here on fresh DOM
+    list.querySelectorAll('.contacts-item').forEach(el => {
       el.addEventListener('click', () => {
-        this.showEditor(container, parseInt(el.dataset.index));
+        this.showEditor(container, el.dataset.id);
       });
     });
   },
 
-  showEditor(container, index) {
-    const contact = index !== null ? this.contacts[index] : { name: '', phone: '', email: '' };
+  setupListeners(container) {
+    // Persistent elements — attach exactly once per render
+    container.querySelector('#contacts-add').addEventListener('click', () => this.showEditor(container, null));
+    container.querySelector('#contacts-search').addEventListener('input', (e) => this.renderList(container, e.target.value));
+  },
+
+  showEditor(container, id) {
+    const contact = id !== null ? this.contacts.find(c => c.id === id) : { name: '', phone: '', email: '' };
+    if (!contact) return;
     const list = container.querySelector('#contacts-list');
     const editor = container.querySelector('#contacts-editor');
     list.style.display = 'none';
     editor.style.display = 'block';
     editor.innerHTML = `
-      <h3 style="margin-bottom:var(--space-3);">${index !== null ? 'Edit Contact' : 'New Contact'}</h3>
+      <h3 style="margin-bottom:var(--space-3);">${id !== null ? 'Edit Contact' : 'New Contact'}</h3>
       <div>
         <label style="display:block;font-size:var(--text-caption);color:var(--content-text-secondary);margin-bottom:var(--space-1);">Name</label>
         <input type="text" id="cedit-name" class="app-input" value="${AppUtils.escapeHtml(contact.name)}" style="width:100%;margin-bottom:var(--space-2);">
@@ -83,7 +96,7 @@ const AppContacts = {
         <input type="text" id="cedit-email" class="app-input" value="${AppUtils.escapeHtml(contact.email)}" style="width:100%;margin-bottom:var(--space-3);">
         <button class="app-btn primary" id="cedit-save">Save</button>
         <button class="app-btn" id="cedit-cancel">Cancel</button>
-        ${index !== null ? '<button class="app-btn" id="cedit-delete" style="color:var(--color-red);">Delete</button>' : ''}
+        ${id !== null ? '<button class="app-btn" id="cedit-delete" style="color:var(--color-red);">Delete</button>' : ''}
       </div>
     `;
 
@@ -93,13 +106,16 @@ const AppContacts = {
         phone: editor.querySelector('#cedit-phone').value,
         email: editor.querySelector('#cedit-email').value,
       };
-      if (index !== null) this.contacts[index] = data;
-      else this.contacts.push(data);
+      if (id !== null) {
+        const idx = this.contacts.findIndex(c => c.id === id);
+        if (idx !== -1) this.contacts[idx] = { id, ...data };
+      } else {
+        this.contacts.push({ id: Date.now().toString(), ...data });
+      }
       this.saveContacts();
       list.style.display = 'block';
       editor.style.display = 'none';
-      this.renderList(container);
-      this.setupListeners(container);
+      this.renderList(container, container.querySelector('#contacts-search').value);
     });
 
     editor.querySelector('#cedit-cancel').addEventListener('click', () => {
@@ -110,12 +126,12 @@ const AppContacts = {
     const delBtn = editor.querySelector('#cedit-delete');
     if (delBtn) {
       delBtn.addEventListener('click', () => {
-        this.contacts.splice(index, 1);
+        const idx = this.contacts.findIndex(c => c.id === id);
+        if (idx !== -1) this.contacts.splice(idx, 1);
         this.saveContacts();
         list.style.display = 'block';
         editor.style.display = 'none';
-        this.renderList(container);
-        this.setupListeners(container);
+        this.renderList(container, container.querySelector('#contacts-search').value);
       });
     }
   }

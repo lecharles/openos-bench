@@ -1,5 +1,7 @@
 // Photos app - gallery view
-const AppPhotos = {
+window.AppPhotos = {
+  _viewerCount: 0,
+
   render(container) {
     const photos = [
       { name: 'Mountain View', color: '#4A90D9', emoji: '🏔️' },
@@ -28,8 +30,9 @@ const AppPhotos = {
     `;
 
     // Create photo viewer as fixed overlay (independent of window clipping)
+    // Unique id per window so multiple Photos windows don't collide
     const viewer = document.createElement('div');
-    viewer.id = 'photo-viewer';
+    viewer.id = 'photo-viewer-' + (++this._viewerCount);
     viewer.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;flex-direction:column;';
     viewer.innerHTML = `
       <div style="font-size:120px;" id="photo-viewer-img"></div>

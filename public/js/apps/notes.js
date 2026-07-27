@@ -1,5 +1,5 @@
 // Notes app
-const AppNotes = {
+window.AppNotes = {
   notes: [],
   selectedNote: null,
   _renderDebounce: null,
@@ -31,7 +31,14 @@ const AppNotes = {
   async loadNotes() {
     try {
       const resp = await fetch('/api/notes');
-      this.notes = await resp.json();
+      const notes = await resp.json();
+      // Migrate legacy {title, body} notes to canonical {id, title, content, updated}
+      this.notes = (Array.isArray(notes) ? notes : []).map(n => ({
+        id: n.id || Date.now().toString() + Math.random().toString(36).slice(2, 8),
+        title: n.title || '',
+        content: n.content !== undefined ? n.content : (n.body || ''),
+        updated: n.updated || Date.now(),
+      }));
     } catch { this.notes = []; }
   },
 
@@ -44,10 +51,11 @@ const AppNotes = {
     if (!list) return;
     list.innerHTML = this.notes.map((n, i) => `
       <div class="app-sidebar-item notes-item${this.selectedNote === i ? ' active' : ''}" data-index="${i}">
-        <div>
+        <div style="flex:1;min-width:0;">
           <div class="item-title">${AppUtils.escapeHtml(n.title || 'Untitled')}</div>
-          <div class="item-preview">${AppUtils.escapeHtml((n.body || '').substring(0, 40))}</div>
+          <div class="item-preview">${AppUtils.escapeHtml((n.content || '').substring(0, 40))}</div>
         </div>
+        <button class="app-btn notes-del-btn" data-index="${i}" style="font-size:10px;padding:2px 6px;flex-shrink:0;">✕</button>
       </div>
     `).join('');
 
@@ -57,13 +65,35 @@ const AppNotes = {
         this._selectNote(container, parseInt(el.dataset.index));
       });
     });
+
+    list.querySelectorAll('.notes-del-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.index);
+        const note = this.notes[idx];
+        if (!note) return;
+        if (!confirm(`Delete "${note.title || 'Untitled'}"?`)) return;
+        this.notes.splice(idx, 1);
+        if (this.selectedNote === idx) {
+          this.selectedNote = null;
+          const placeholder = container.querySelector('#notes-placeholder');
+          const editor = container.querySelector('#notes-editor');
+          if (placeholder) placeholder.style.display = '';
+          if (editor) editor.style.display = 'none';
+        } else if (this.selectedNote > idx) {
+          this.selectedNote--;
+        }
+        this.saveNotes();
+        this._renderSidebarOnly(container);
+      });
+    });
   },
 
   _setupListeners(container) {
     const newBtn = container.querySelector('#notes-new');
     if (newBtn) {
       newBtn.addEventListener('click', () => {
-        this.notes.unshift({ title: '', body: '' });
+        this.notes.unshift({ id: Date.now().toString(), title: '', content: '', updated: Date.now() });
         this.selectedNote = 0;
         this._selectNote(container, 0);
         this._renderSidebarOnly(container);
@@ -94,7 +124,7 @@ const AppNotes = {
     const titleEl = container.querySelector('#notes-title');
     const bodyEl = container.querySelector('#notes-body');
     if (titleEl) titleEl.value = note.title || '';
-    if (bodyEl) bodyEl.value = note.body || '';
+    if (bodyEl) bodyEl.value = note.content || '';
 
     // Update active state in sidebar
     const sidebar = container.querySelector('#notes-sidebar-list');
@@ -109,9 +139,12 @@ const AppNotes = {
     if (this.selectedNote === null) return;
     const titleEl = container.querySelector('#notes-title');
     const bodyEl = container.querySelector('#notes-body');
+    const current = this.notes[this.selectedNote] || {};
     this.notes[this.selectedNote] = {
+      id: current.id || Date.now().toString(),
       title: titleEl?.value || '',
-      body: bodyEl?.value || '',
+      content: bodyEl?.value || '',
+      updated: Date.now(),
     };
     this.saveNotes();
     // Only update sidebar preview text, don't re-bind everything
@@ -124,7 +157,7 @@ const AppNotes = {
         const title = item.querySelector('.item-title');
         const preview = item.querySelector('.item-preview');
         if (title) title.textContent = n.title || 'Untitled';
-        if (preview) preview.textContent = (n.body || '').substring(0, 40);
+        if (preview) preview.textContent = (n.content || '').substring(0, 40);
       }
     }
   }

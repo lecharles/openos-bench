@@ -1,11 +1,5 @@
 // Trash app
-const AppTrash = {
-  items: [
-    { name: 'old_script.sh', date: 'Jul 25', size: '2.3 KB' },
-    { name: 'draft.txt', date: 'Jul 23', size: '456 B' },
-    { name: 'temp_data.json', date: 'Jul 20', size: '15 KB' },
-  ],
-
+window.AppTrash = {
   render(container) {
     container.innerHTML = `
       <div class="app-toolbar">
@@ -16,44 +10,71 @@ const AppTrash = {
       <div id="trash-list" class="app-list"></div>
     `;
 
-    this.renderList(container);
-    this.setupListeners(container);
-  },
-
-  renderList(container) {
-    const list = container.querySelector('#trash-list');
-    if (this.items.length === 0) {
-      list.innerHTML = '<div class="app-empty">🗑️ Trash is empty</div>';
-      return;
-    }
-    list.innerHTML = this.items.map((item, i) => `
-      <div class="app-list-item" style="padding:10px 12px;">
-        <span style="font-size:20px;">📄</span>
-        <span style="flex:1;">${item.name}</span>
-        <span style="font-size:11px;color:#999;">${item.date}</span>
-        <span style="font-size:11px;color:#999;margin-left:8px;">${item.size}</span>
-        <button class="app-btn" data-restore="${i}" style="font-size:10px;padding:2px 6px;margin-left:8px;">Restore</button>
-      </div>
-    `).join('');
-  },
-
-  setupListeners(container) {
-    container.querySelector('#trash-empty')?.addEventListener('click', () => {
-      if (confirm('Permanently delete all items in Trash?')) {
-        this.items = [];
-        this.renderList(container);
-        this.setupListeners(container);
+    // Bind persistent toolbar button exactly once
+    container.querySelector('#trash-empty').addEventListener('click', async () => {
+      if (!confirm('Permanently delete all items in Trash?')) return;
+      try {
+        const resp = await fetch('/api/trash/empty', { method: 'POST' });
+        const data = await resp.json();
+        if (!resp.ok) {
+          Notifications.add('Trash', data.error || 'Failed to empty Trash');
+          return;
+        }
         Notifications.add('Trash', 'Trash emptied');
+        this.load(container);
+      } catch (e) {
+        Notifications.add('Trash', 'Failed to empty Trash: ' + e.message);
       }
     });
 
-    container.querySelectorAll('[data-restore]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.restore);
-        const item = this.items.splice(idx, 1)[0];
-        Notifications.add('Trash', `"${item.name}" restored`);
-        this.renderList(container);
-        this.setupListeners(container);
+    this.load(container);
+  },
+
+  async load(container) {
+    const list = container.querySelector('#trash-list');
+    list.innerHTML = '<div class="app-empty">Loading...</div>';
+
+    let items;
+    try {
+      const resp = await fetch('/api/trash');
+      items = await resp.json();
+    } catch (e) {
+      list.innerHTML = '<div class="app-empty">Failed to load Trash</div>';
+      return;
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      list.innerHTML = '<div class="app-empty">🗑️ Trash is empty</div>';
+      return;
+    }
+
+    list.innerHTML = items.map(item => `
+      <div class="app-list-item" style="padding:10px 12px;">
+        <span style="font-size:20px;">📄</span>
+        <span style="flex:1;">${AppUtils.escapeHtml(item.name)}</span>
+        <span style="font-size:11px;color:#999;">${AppUtils.escapeHtml(new Date(item.deletedAt).toLocaleDateString())}</span>
+        <button class="app-btn" data-restore="${AppUtils.escapeHtml(item.id)}" style="font-size:10px;padding:2px 6px;margin-left:8px;">Restore</button>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('[data-restore]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch('/api/trash/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: btn.dataset.restore })
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            Notifications.add('Trash', data.error || 'Restore failed');
+            return;
+          }
+          Notifications.add('Trash', 'Item restored');
+          this.load(container);
+        } catch (e) {
+          Notifications.add('Trash', 'Restore failed: ' + e.message);
+        }
       });
     });
   }

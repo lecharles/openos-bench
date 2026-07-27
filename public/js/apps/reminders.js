@@ -1,5 +1,5 @@
 // Reminders app
-const AppReminders = {
+window.AppReminders = {
   reminders: [],
 
   async render(container) {
@@ -37,8 +37,8 @@ const AppReminders = {
     list.innerHTML = this.reminders.map((r, i) => `
       <div class="app-list-item" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">
         <input type="checkbox" ${r.done ? 'checked' : ''} data-index="${i}" class="rem-checkbox" style="width:18px;height:18px;cursor:pointer;">
-        <span style="flex:1;text-decoration:${r.done ? 'line-through' : 'none'};color:${r.done ? '#999' : '#1d1d1f'};">${AppUtils.escapeHtml(r.title)}</span>
-        <span style="font-size:11px;color:#999;">${AppUtils.escapeHtml(r.date || '')}</span>
+        <span style="flex:1;text-decoration:${r.done ? 'line-through' : 'none'};${r.done ? 'color:var(--content-text-tertiary);' : ''}">${AppUtils.escapeHtml(r.title)}</span>
+        <span style="font-size:11px;color:var(--content-text-tertiary);">${AppUtils.escapeHtml(r.date || '')}</span>
         <button class="app-btn rem-del-btn" data-index="${i}" style="font-size:10px;padding:2px 6px;">✕</button>
       </div>
     `).join('');

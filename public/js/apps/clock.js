@@ -1,5 +1,5 @@
 // Clock app - world clock, alarm, stopwatch, timer
-const AppClock = {
+window.AppClock = {
   _clockTimer: null,
   _swInterval: null,
   _swTime: 0,
@@ -30,6 +30,12 @@ const AppClock = {
     container.querySelector('#clock-timer').addEventListener('click', () => {
       this._showTimer(container);
     });
+
+    // Register cleanup with window manager
+    const winEl = container.closest('.window');
+    if (winEl && winEl._winObj) {
+      winEl._winObj._cleanup = () => this.cleanup();
+    }
   },
 
   cleanup() {
@@ -103,8 +109,9 @@ const AppClock = {
   },
 
   _showTimer(container) {
-    // Clear any running stopwatch interval
+    // Clear any running stopwatch interval and reset its state
     if (this._swInterval) { clearInterval(this._swInterval); this._swInterval = null; }
+    this._swRunning = false;
     if (this._timerInterval) { clearInterval(this._timerInterval); this._timerInterval = null; }
 
     const extra = container.querySelector('#clock-extra');

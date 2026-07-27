@@ -1,5 +1,5 @@
 // Agent Control app
-const AppAgentControl = {
+window.AppAgentControl = {
   agents: [
     { id: 'hermes', name: 'Hermes', icon: '🧠', port: 8400 },
     { id: 'openclaw', name: 'OpenClaw', icon: '🦞', port: 8401 },
@@ -54,6 +54,7 @@ const AppAgentControl = {
         const detailsEl = card?.querySelector('.ac-agent-details');
         try {
           const resp = await fetch(`/api/agent/${agent}/health`);
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
           const data = await resp.json();
           if (statusEl) { statusEl.textContent = 'Healthy'; statusEl.className = 'ac-agent-status app-status online'; }
           if (detailsEl) detailsEl.textContent = JSON.stringify(data);
@@ -85,12 +86,13 @@ const AppAgentControl = {
         const card = container.querySelector(`.ac-agent-card[data-agent="${agent}"]`);
         const statusEl = card?.querySelector('.ac-agent-status');
         if (!confirm(`Restart ${agent} agent?`)) return;
-        if (statusEl) { statusEl.textContent = 'Restarting...'; statusEl.className = 'ac-agent-status app-status offline'; statusEl.style.color = '#febc2e'; }
+        if (statusEl) { statusEl.style.color = ''; statusEl.textContent = 'Restarting...'; statusEl.className = 'ac-agent-status app-status offline'; statusEl.style.color = '#febc2e'; }
         try {
-          await fetch(`/api/agent/${agent}/restart`, { method: 'POST' });
+          const resp = await fetch(`/api/agent/${agent}/restart`, { method: 'POST' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
           setTimeout(() => this.refreshAll(container), 2000);
         } catch {
-          if (statusEl) { statusEl.textContent = 'Restart failed'; statusEl.className = 'ac-agent-status app-status offline'; }
+          if (statusEl) { statusEl.style.color = ''; statusEl.textContent = 'Restart failed'; statusEl.className = 'ac-agent-status app-status offline'; statusEl.style.color = '#ff3b30'; }
         }
       });
     });
@@ -101,6 +103,7 @@ const AppAgentControl = {
         const log = container.querySelector('#ac-log');
         const logContent = container.querySelector('#ac-log-content');
         log.style.display = 'block';
+        log.style.whiteSpace = 'pre-wrap';
         logContent.innerHTML = `Running diagnostics for ${agent}...\n`;
 
         const results = [];

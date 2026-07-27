@@ -1,5 +1,5 @@
 // Calculator app
-const AppCalculator = {
+window.AppCalculator = {
   render(container) {
     container.innerHTML = `
       <div style="max-width:260px;margin:0 auto;">
@@ -32,6 +32,8 @@ const AppCalculator = {
     this.previous = '';
     this.operator = null;
     this.resetFlag = false;
+    this.lastOperator = null;
+    this.lastOperand = null;
   },
 
   handleButton(label, container) {
@@ -39,23 +41,39 @@ const AppCalculator = {
 
     if (label === 'C') {
       this.current = '0'; this.previous = ''; this.operator = null; this.resetFlag = false;
+      this.lastOperator = null; this.lastOperand = null;
     } else if (label === '±') {
+      if (this.current === 'Error') return;
       this.current = (parseFloat(this.current) * -1).toString();
     } else if (label === '%') {
+      if (this.current === 'Error') return;
       this.current = (parseFloat(this.current) / 100).toString();
     } else if (['÷','×','−','+'].includes(label)) {
+      if (this.current === 'Error') return;
       if (this.operator && !this.resetFlag) this.calculate();
       this.previous = this.current;
       this.operator = label;
       this.resetFlag = true;
     } else if (label === '=') {
-      this.calculate();
-      this.operator = null;
+      if (this.operator) {
+        this.lastOperator = this.operator;
+        this.lastOperand = this.current;
+        this.calculate();
+        this.operator = null;
+      } else if (this.lastOperator) {
+        // Repeat last operation (macOS behavior)
+        this.previous = this.current;
+        this.current = this.lastOperand;
+        this.operator = this.lastOperator;
+        this.calculate();
+        this.operator = null;
+      }
+      this.resetFlag = true;
     } else if (label === '.') {
-      if (this.resetFlag) { this.current = '0'; this.resetFlag = false; }
+      if (this.resetFlag || this.current === 'Error') { this.current = '0'; this.resetFlag = false; }
       if (!this.current.includes('.')) this.current += '.';
     } else {
-      if (this.resetFlag) { this.current = ''; this.resetFlag = false; }
+      if (this.resetFlag || this.current === 'Error') { this.current = ''; this.resetFlag = false; }
       if (this.current === '0') this.current = label;
       else this.current += label;
     }
@@ -68,8 +86,14 @@ const AppCalculator = {
     const curr = parseFloat(this.current);
     if (isNaN(prev) || isNaN(curr)) return;
 
+    if (this.operator === '÷' && curr === 0) {
+      this.current = 'Error';
+      return;
+    }
+
     const ops = { '÷': (a,b) => a/b, '×': (a,b) => a*b, '−': (a,b) => a-b, '+': (a,b) => a+b };
     const result = ops[this.operator](prev, curr);
+    if (!isFinite(result)) { this.current = 'Error'; return; }
     this.current = Number.isInteger(result) ? result.toString() : parseFloat(result.toFixed(8)).toString();
   }
 };

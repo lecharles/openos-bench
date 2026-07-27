@@ -72,6 +72,7 @@
   --dock-border: rgba(255,255,255,0.24);
   --dock-separator: rgba(0,0,0,0.18);
   --dock-indicator: rgba(0,0,0,0.45);
+  --dock-item-hover: rgba(255,255,255,0.25);
   --window-bg: rgba(255,255,255,0.88);
   --window-border: rgba(0,0,0,0.08);
   --window-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
@@ -112,6 +113,7 @@
   --control-item-hover: rgba(0,0,0,0.10);
   --control-item-active: var(--color-blue);
   --notification-bg: rgba(0,0,0,0.03);
+  --toolbar-bg: rgba(255,255,255,0.3);
 
   /* Shadows for depth hierarchy */
   --elevation-1: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
@@ -147,7 +149,7 @@
 
 /* Dark theme */
 [data-theme="dark"] {
-  --bg-wallpaper: linear-gradient(135deg, #1a1a2e 0%, #16213e 33%, #0f3460 66%, #533483 100%);
+  --bg-wallpaper: linear-gradient(135deg, #16222e 0%, #25406b 45%, #4a3f78 100%);
   --menubar-bg: rgba(30,30,30,0.82);
   --menubar-border: rgba(255,255,255,0.08);
   --menubar-text: #f5f5f7;
@@ -157,6 +159,7 @@
   --dock-border: rgba(255,255,255,0.10);
   --dock-separator: rgba(255,255,255,0.20);
   --dock-indicator: rgba(255,255,255,0.50);
+  --dock-item-hover: rgba(255,255,255,0.12);
   --window-bg: rgba(30,30,30,0.88);
   --window-border: rgba(255,255,255,0.08);
   --window-shadow-sm: 0 1px 3px rgba(0,0,0,0.20), 0 1px 2px rgba(0,0,0,0.15);
@@ -197,11 +200,17 @@
   --control-item-hover: rgba(255,255,255,0.14);
   --control-item-active: var(--color-blue);
   --notification-bg: rgba(255,255,255,0.05);
+  --toolbar-bg: rgba(255,255,255,0.06);
   --elevation-1: 0 1px 2px rgba(0,0,0,0.20), 0 1px 3px rgba(0,0,0,0.12);
   --elevation-2: 0 2px 8px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15);
   --elevation-3: 0 4px 16px rgba(0,0,0,0.30), 0 2px 6px rgba(0,0,0,0.18);
   --elevation-4: 0 8px 32px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.22);
   --elevation-5: 0 16px 48px rgba(0,0,0,0.42), 0 8px 24px rgba(0,0,0,0.28);
+}
+
+/* Dark theme overrides for rules that need more than a token swap */
+[data-theme="dark"] .window.focused {
+  border-color: rgba(255,255,255,0.14);
 }
 
 /* ================================================================
@@ -354,7 +363,7 @@ body {
 .menubar-clock {
   font-size: var(--text-body);
   font-weight: var(--weight-regular);
-  cursor: default;
+  cursor: pointer;
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--tracking-tight);
 }
@@ -482,7 +491,7 @@ body {
   position: relative;
 }
 .dock-item:hover {
-  background: rgba(255,255,255,0.25);
+  background: var(--dock-item-hover);
   width: 72px;
 }
 .dock-item:active {
@@ -513,7 +522,7 @@ body {
 .dock-label {
   font-size: 10px;
   font-weight: var(--weight-medium);
-  color: rgba(0,0,0,0.55);
+  color: var(--content-text-secondary);
   margin-top: 2px;
   white-space: nowrap;
   opacity: 0;
@@ -611,18 +620,6 @@ body {
   animation: window-open var(--duration-spring) var(--ease-spring);
 }
 
-/* Window close animation */
-@keyframes window-close {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-}
-
 /* === Titlebar === */
 .window-titlebar {
   display: flex;
@@ -661,6 +658,10 @@ body {
 }
 .window-btn:active {
   transform: scale(0.88);
+}
+/* Dim traffic lights on unfocused windows */
+.window:not(.focused) .window-btn {
+  filter: grayscale(0.8) opacity(0.55);
 }
 .window-btn.close { background: #FF5F57; }
 .window-btn.minimize { background: #FFBD2E; }
@@ -750,12 +751,23 @@ body {
   backdrop-filter: var(--blur-overlay);
   -webkit-backdrop-filter: var(--blur-overlay);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity var(--duration-enter) var(--ease-smooth);
+  transition: opacity var(--duration-enter) var(--ease-smooth),
+              visibility var(--duration-enter) var(--ease-smooth);
 }
 .overlay:not(.hidden) {
   opacity: 1;
+  visibility: visible;
   pointer-events: all;
+}
+
+/* Notification Center & Control Center float above the desktop without dimming it (macOS behavior) */
+#notification-overlay,
+#control-overlay {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* ================================================================
@@ -865,7 +877,7 @@ body {
   padding: var(--space-5);
   position: absolute;
   right: 16px;
-  top: 4px;
+  top: 38px;
   overflow-y: auto;
   transform: translateY(-8px) scale(0.97);
   transition: transform var(--duration-enter) var(--ease-spring);
@@ -923,7 +935,7 @@ body {
   padding: var(--space-5);
   position: absolute;
   right: 16px;
-  top: 4px;
+  top: 38px;
   transform: translateY(-8px) scale(0.97);
   transition: transform var(--duration-enter) var(--ease-spring);
 }
@@ -972,11 +984,56 @@ body {
   line-height: 1;
 }
 .control-item.active {
-  background: var(--control-item-active);
-  color: #fff;
+  background: var(--control-item-bg);
+  color: inherit;
 }
 .control-item.active span {
-  filter: brightness(2);
+  background: var(--control-item-active);
+  border-radius: 50%;
+  padding: 6px;
+}
+
+/* Slider rows (brightness, volume) */
+.control-slider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-xl);
+  background: var(--control-item-bg);
+}
+.control-slider span {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.control-slider input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--color-blue);
+}
+.control-slider label {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--content-text-secondary);
+  flex-shrink: 0;
+  min-width: 64px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================================================================
+   Screen Brightness Dim Layer
+   ================================================================ */
+#brightness-dim {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4000;
+  transition: opacity 150ms var(--ease-default);
 }
 
 /* ================================================================
@@ -1047,18 +1104,22 @@ body {
   border: 0.5px solid var(--context-menu-border);
   padding: 4px 0;
   opacity: 0;
+  visibility: hidden;
   transform: scale(0.96);
   transform-origin: top left;
   transition: opacity var(--duration-fast) var(--ease-smooth),
-              transform var(--duration-fast) var(--ease-smooth);
+              transform var(--duration-fast) var(--ease-smooth),
+              visibility var(--duration-fast) var(--ease-smooth);
 }
 .context-menu:not(.hidden) {
   opacity: 1;
+  visibility: visible;
   transform: scale(1);
 }
 .context-menu.hidden {
   display: block;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 
@@ -1092,7 +1153,7 @@ body {
   padding: var(--space-3) var(--space-4);
   border-bottom: 0.5px solid var(--separator);
   margin: 0;
-  background: rgba(255,255,255,0.3);
+  background: var(--toolbar-bg);
 }
 
 .app-toolbar button,
@@ -1251,10 +1312,10 @@ textarea.app-input {
   text-align: right;
 }
 .app-chat-bubble.agent {
-  background: rgba(0,0,0,0.05);
+  background: var(--control-item-bg);
 }
 .app-chat-bubble code {
-  background: rgba(0,0,0,0.08); padding: 1px 4px; border-radius: 3px;
+  background: var(--control-item-hover); padding: 1px 4px; border-radius: 3px;
   font-family: var(--font-mono); font-size: var(--text-caption-strong);
 }
 
@@ -1318,6 +1379,11 @@ textarea.app-input {
   color: var(--content-text-tertiary);
 }
 
+/* Clock app digits */
+#clock-display, #clock-extra {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Status badge */
 .app-status {
   font-size: var(--text-caption); padding: 2px 8px; border-radius: var(--radius-sm);
@@ -1369,6 +1435,7 @@ textarea.app-input {
   border-radius: var(--radius-md); padding: var(--space-3);
   max-height: 200px; overflow-y: auto;
   font-family: var(--font-mono); font-size: var(--text-caption-strong);
+  white-space: pre-wrap;
 }
 
 /* Messages chat */
@@ -1381,7 +1448,7 @@ textarea.app-input {
   background: var(--color-blue); color: #fff;
 }
 .app-messages-bubble.other {
-  background: rgba(0,0,0,0.06); color: var(--content-text);
+  background: var(--control-item-bg); color: var(--content-text);
 }
 .app-messages-time {
   font-size: 10px; color: var(--content-text-tertiary);
@@ -1389,8 +1456,12 @@ textarea.app-input {
 }
 
 /* ================================================================
-   Scrollbar (WebKit)
+   Scrollbar (WebKit + Firefox)
    ================================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -1433,6 +1504,24 @@ input:focus-visible {
 input::selection,
 textarea::selection {
   background: rgba(0,122,255,0.25);
+}
+
+/* ================================================================
+   Responsive: narrow screens
+   ================================================================ */
+@media (max-width: 1100px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(5, 84px);
+    gap: 20px 24px;
+  }
+  .window {
+    max-width: 96vw;
+  }
+  .spotlight-box,
+  .notification-panel,
+  .control-panel {
+    max-width: 96vw;
+  }
 }
 
 /* ================================================================

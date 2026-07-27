@@ -1,6 +1,8 @@
 // Finder - file browser
-const AppFinder = {
+window.AppFinder = {
   currentDir: '/root',
+  _back: [],
+  _fwd: [],
 
   async render(container, opts) {
     if (opts && opts.dir) this.currentDir = opts.dir;
@@ -10,23 +12,36 @@ const AppFinder = {
         <button id="finder-fwd">▶</button>
         <button id="finder-home">🏠 Home</button>
         <span class="app-spacer"></span>
-        <span id="finder-path" class="app-finder-path">${this.currentDir}</span>
+        <span id="finder-path" class="app-finder-path">${AppUtils.escapeHtml(this.currentDir)}</span>
       </div>
       <div id="finder-list" class="app-list" style="flex:1;overflow-y:auto;"></div>
     `;
 
     container.querySelector('#finder-back').addEventListener('click', () => {
-      const parts = this.currentDir.split('/').filter(Boolean);
-      parts.pop();
-      this.currentDir = '/' + parts.join('/');
+      if (this._back.length === 0) return;
+      this._fwd.push(this.currentDir);
+      this.currentDir = this._back.pop();
+      this.loadDir(container);
+    });
+    container.querySelector('#finder-fwd').addEventListener('click', () => {
+      if (this._fwd.length === 0) return;
+      this._back.push(this.currentDir);
+      this.currentDir = this._fwd.pop();
       this.loadDir(container);
     });
     container.querySelector('#finder-home').addEventListener('click', () => {
-      this.currentDir = '/root';
-      this.loadDir(container);
+      this.navigate(container, '/root');
     });
 
     await this.loadDir(container);
+  },
+
+  // Navigate to a new directory, pushing current location onto the back stack
+  navigate(container, dir) {
+    this._back.push(this.currentDir);
+    this._fwd = [];
+    this.currentDir = dir;
+    this.loadDir(container);
   },
 
   async loadDir(container) {
@@ -50,8 +65,12 @@ const AppFinder = {
         parentItem.addEventListener('dblclick', () => {
           const parts = this.currentDir.split('/').filter(Boolean);
           parts.pop();
-          this.currentDir = '/' + parts.join('/');
-          this.loadDir(container);
+          if (parts.length === 0) {
+            // '/' is outside the allowed roots — stay put
+            Notifications.add('Finder', 'Cannot go above this folder (access restricted)');
+            return;
+          }
+          this.navigate(container, '/' + parts.join('/'));
         });
         list.appendChild(parentItem);
       }
@@ -73,15 +92,43 @@ const AppFinder = {
           <span class="app-finder-item-size">${sizeStr}</span>
         `;
         item.addEventListener('dblclick', () => {
+          const base = this.currentDir.replace(/\/+$/, '');
           if (entry.type === 'directory') {
-            const base = this.currentDir.replace(/\/+$/, '');
-            this.currentDir = base + '/' + entry.name;
-            this.loadDir(container);
+            this.navigate(container, base + '/' + entry.name);
           } else {
-            const base = this.currentDir.replace(/\/+$/, '');
             this.openFile(base + '/' + entry.name, entry.name);
           }
         });
+
+        // Move to Trash action
+        const trashBtn = document.createElement('button');
+        trashBtn.className = 'app-btn';
+        trashBtn.textContent = '🗑';
+        trashBtn.title = 'Move to Trash';
+        trashBtn.style.cssText = 'font-size:11px;padding:2px 6px;margin-left:8px;';
+        trashBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const base = this.currentDir.replace(/\/+$/, '');
+          const fp = base + '/' + entry.name;
+          try {
+            const resp = await fetch('/api/fs/trash', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ path: fp })
+            });
+            const data = await resp.json();
+            if (!resp.ok) {
+              Notifications.add('Finder', data.error || 'Move to Trash failed');
+              return;
+            }
+            Notifications.add('Finder', `"${entry.name}" moved to Trash`);
+            this.loadDir(container);
+          } catch (err) {
+            Notifications.add('Finder', 'Move to Trash failed: ' + err.message);
+          }
+        });
+        item.appendChild(trashBtn);
+
         list.appendChild(item);
       });
     } catch (e) {
@@ -94,9 +141,11 @@ const AppFinder = {
       try {
         const resp = await fetch(`/api/fs/read?file=${encodeURIComponent(path)}`);
         const data = await resp.json();
-        if (data.content) {
-          WindowManager.open('textedit', name, { content: data.content, path: path });
+        if (data.error) {
+          Notifications.add('Finder', data.error);
+          return;
         }
+        WindowManager.open('textedit', name, { content: data.content || '', path: path });
       } catch {}
     } else {
       WindowManager.open('preview', name, { path: path });

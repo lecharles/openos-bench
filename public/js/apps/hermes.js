@@ -1,8 +1,9 @@
 // Hermes agent app
-const AppHermes = {
+window.AppHermes = {
   history: [],
   streaming: false,
   _agentInfo: { provider: '—', model: '—' },
+  _streamBuf: null,
 
   render(container) {
     container.innerHTML = `
@@ -28,6 +29,7 @@ const AppHermes = {
     `;
 
     this._setupChat(container);
+    this._setupSocket(container);
     this._checkHealth(container);
   },
 
@@ -39,6 +41,17 @@ const AppHermes = {
       const role = m.role === 'user' ? 'user' : 'agent';
       return `<div class="app-chat-bubble ${role}">${AppUtils.renderMarkdown(m.content)}</div>`;
     }).join('');
+  },
+
+  _mockReply() {
+    const mockResponses = [
+      'I understand. Let me help you with that.',
+      "That's an interesting question. Here's what I think...",
+      "I'd be happy to assist with that task.",
+      'Let me analyze this for you.',
+      'Based on the information, I would suggest the following approach.',
+    ];
+    return mockResponses[Math.floor(Math.random() * mockResponses.length)];
   },
 
   _setupChat(container) {
@@ -73,11 +86,90 @@ const AppHermes = {
     });
 
     container.querySelector('#hermes-reconnect').addEventListener('click', () => {
+      if (window.socket && !window.socket.connected) window.socket.connect();
       this._checkHealth(container);
     });
   },
 
+  _setupSocket(container) {
+    if (!window.socket) return;
+
+    const onChunk = (data) => {
+      if (!data || data.agent !== 'hermes' || !this._streamBuf) return;
+      this._streamBuf.text += data.content || '';
+      const last = this.history[this.history.length - 1];
+      if (last && last.role === 'assistant') last.content = this._streamBuf.text;
+      const messages = container.querySelector('#hermes-messages');
+      if (messages) {
+        messages.innerHTML = this._renderMessages();
+        messages.scrollTop = messages.scrollHeight;
+      }
+    };
+    const onDone = (data) => {
+      if (!data || data.agent !== 'hermes' || !this._streamBuf) return;
+      const last = this.history[this.history.length - 1];
+      if (!last || last.role !== 'assistant') {
+        this.history.push({ role: 'assistant', content: this._streamBuf.text || 'No response' });
+      }
+      this._streamBuf = null;
+      this._endStreaming(container);
+    };
+    const onError = (data) => {
+      if (!data || data.agent !== 'hermes' || !this._streamBuf) return;
+      const last = this.history[this.history.length - 1];
+      if (last && last.role === 'assistant') {
+        last.content = this._mockReply();
+      } else {
+        this.history.push({ role: 'assistant', content: this._mockReply() });
+      }
+      this._streamBuf = null;
+      this._endStreaming(container);
+    };
+
+    window.socket.on('agent:chunk', onChunk);
+    window.socket.on('agent:done', onDone);
+    window.socket.on('agent:error', onError);
+
+    const winEl = container.closest('.window');
+    if (winEl && winEl._winObj) {
+      const origCleanup = winEl._winObj._cleanup;
+      winEl._winObj._cleanup = () => {
+        window.socket.off('agent:chunk', onChunk);
+        window.socket.off('agent:done', onDone);
+        window.socket.off('agent:error', onError);
+        if (origCleanup) origCleanup();
+      };
+    }
+  },
+
+  _endStreaming(container) {
+    const messages = container.querySelector('#hermes-messages');
+    if (messages) {
+      messages.innerHTML = this._renderMessages();
+      messages.scrollTop = messages.scrollHeight;
+    }
+    this.streaming = false;
+    const send = container.querySelector('#hermes-send');
+    if (send) { send.disabled = false; send.textContent = 'Send'; }
+  },
+
   async _sendToAgent(text, container) {
+    if (window.socket && window.socket.connected) {
+      this.history.push({ role: 'assistant', content: '' });
+      this._streamBuf = { text: '' };
+      const messages = container.querySelector('#hermes-messages');
+      if (messages) {
+        messages.innerHTML = this._renderMessages();
+        messages.scrollTop = messages.scrollHeight;
+      }
+      window.socket.emit('agent:chat', {
+        agent: 'hermes',
+        message: text,
+        history: this.history.slice(0, -2)
+      });
+      return;
+    }
+
     const messages = container.querySelector('#hermes-messages');
     try {
       const resp = await fetch('/api/agent/hermes/chat', {
@@ -92,14 +184,7 @@ const AppHermes = {
         throw new Error('Agent returned ' + resp.status);
       }
     } catch {
-      const mockResponses = [
-        'I understand. Let me help you with that.',
-        "That's an interesting question. Here's what I think...",
-        "I'd be happy to assist with that task.",
-        'Let me analyze this for you.',
-        'Based on the information, I would suggest the following approach.',
-      ];
-      this.history.push({ role: 'assistant', content: mockResponses[Math.floor(Math.random() * mockResponses.length)] });
+      this.history.push({ role: 'assistant', content: this._mockReply() });
     }
 
     messages.innerHTML = this._renderMessages();
@@ -116,6 +201,7 @@ const AppHermes = {
 
     try {
       const resp = await fetch('/api/agent/hermes/health');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const data = await resp.json();
       status.textContent = data.status || 'Connected';
       status.className = 'app-status online';

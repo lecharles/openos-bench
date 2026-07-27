@@ -1,5 +1,5 @@
 // Text Editor app
-const AppTextEdit = {
+window.AppTextEdit = {
   render(container, opts) {
     const content = opts?.content || '';
     let currentPath = opts?.path || '';
@@ -26,6 +26,9 @@ const AppTextEdit = {
         currentPath = newPath;
         pathEl.textContent = newPath;
         if (opts) opts.path = newPath;
+        const winEl = container.closest('.window');
+        const titleEl = winEl && winEl.querySelector('.window-title');
+        if (titleEl) titleEl.textContent = newPath.split('/').pop();
       }
       try {
         await fetch('/api/fs/write', {

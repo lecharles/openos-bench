@@ -1,12 +1,14 @@
 // Terminal app
-const AppTerminal = {
-  cwd: '/root',
+window.AppTerminal = {
+  cwd: '/root', // default cwd; each window keeps its own copy in render()
 
   render(container) {
+    let cwd = this.cwd;
+
     container.innerHTML = `
       <div class="app-terminal-output" id="terminal-output">
         <div style="color:#888;">KiMi Terminal — type 'help' for commands</div>
-        <div style="color:#888;">Current directory: ${AppUtils.escapeHtml(this.cwd)}</div>
+        <div style="color:#888;">Current directory: ${AppUtils.escapeHtml(cwd)}</div>
       </div>
       <div class="app-terminal-input-row">
         <span class="app-terminal-prompt">$</span>
@@ -30,23 +32,25 @@ const AppTerminal = {
           return;
         }
         if (cmd === 'pwd') {
-          output.innerHTML += `\n${AppUtils.escapeHtml(this.cwd)}`;
+          output.innerHTML += `\n${AppUtils.escapeHtml(cwd)}`;
           output.scrollTop = output.scrollHeight;
           return;
         }
-        if (cmd.startsWith('cd ')) {
-          const target = cmd.slice(3).trim();
-          if (target === '..') {
-            const parts = this.cwd.split('/').filter(Boolean);
+        if (cmd === 'cd' || cmd.startsWith('cd ')) {
+          const target = cmd === 'cd' ? '' : cmd.slice(3).trim();
+          if (target === '' || target === '~') {
+            cwd = '/root';
+          } else if (target === '..') {
+            const parts = cwd.split('/').filter(Boolean);
             parts.pop();
-            this.cwd = '/' + parts.join('/');
-            if (this.cwd === '') this.cwd = '/';
+            cwd = '/' + parts.join('/');
+            if (cwd === '') cwd = '/';
           } else if (target.startsWith('/')) {
-            this.cwd = target.replace(/\/+/g, '/');
+            cwd = target.replace(/\/+/g, '/');
           } else {
-            this.cwd = (this.cwd.replace(/\/+$/, '') + '/' + target).replace(/\/+/g, '/');
+            cwd = (cwd.replace(/\/+$/, '') + '/' + target).replace(/\/+/g, '/');
           }
-          output.innerHTML += `\n<span style="color:#888;">→ ${AppUtils.escapeHtml(this.cwd)}</span>`;
+          output.innerHTML += `\n<span style="color:#888;">→ ${AppUtils.escapeHtml(cwd)}</span>`;
           output.scrollTop = output.scrollHeight;
           return;
         }
@@ -57,17 +61,21 @@ const AppTerminal = {
           const resp = await fetch('/api/terminal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ command: cmd, cwd: this.cwd })
+            body: JSON.stringify({ command: cmd, cwd: cwd })
           });
           const data = await resp.json();
-          if (data.stdout && data.stdout.trim()) {
-            output.innerHTML += '\n' + AppUtils.escapeHtml(data.stdout.trimEnd());
-          }
-          if (data.stderr && data.stderr.trim()) {
-            output.innerHTML += '\n<span style="color:#ff5f57;">' + AppUtils.escapeHtml(data.stderr.trimEnd()) + '</span>';
-          }
-          if (data.exitCode && data.exitCode !== 0) {
-            output.innerHTML += '\n<span style="color:#ff5f57;">[exit: ' + data.exitCode + ']</span>';
+          if (!resp.ok) {
+            output.innerHTML += '\n<span style="color:#ff5f57;">' + AppUtils.escapeHtml(data.error || ('HTTP ' + resp.status)) + '</span>';
+          } else {
+            if (data.stdout && data.stdout.trim()) {
+              output.innerHTML += '\n' + AppUtils.escapeHtml(data.stdout.trimEnd());
+            }
+            if (data.stderr && data.stderr.trim()) {
+              output.innerHTML += '\n<span style="color:#ff5f57;">' + AppUtils.escapeHtml(data.stderr.trimEnd()) + '</span>';
+            }
+            if (data.exitCode && data.exitCode !== 0) {
+              output.innerHTML += '\n<span style="color:#ff5f57;">[exit: ' + data.exitCode + ']</span>';
+            }
           }
         } catch (e) {
           output.innerHTML += '\n<span style="color:#ff5f57;">Error: ' + AppUtils.escapeHtml(e.message) + '</span>';

@@ -1,5 +1,5 @@
 // Activity Monitor app
-const AppActivity = {
+window.AppActivity = {
   _timer: null,
 
   render(container) {
@@ -59,7 +59,7 @@ const AppActivity = {
       const tbody = container.querySelector('#activity-body');
       tbody.innerHTML = processes.map(p => `
         <tr style="border-bottom:1px solid rgba(0,0,0,0.03);">
-          <td style="padding:6px 8px;font-family:monospace;font-size:11px;">${p.command.substring(0, 50)}</td>
+          <td style="padding:6px 8px;font-family:monospace;font-size:11px;">${AppUtils.escapeHtml(p.command.substring(0, 50))}</td>
           <td style="padding:6px 8px;">${p.cpu}%</td>
           <td style="padding:6px 8px;">${p.mem}%</td>
           <td style="padding:6px 8px;">${p.stat}</td>

@@ -1,5 +1,5 @@
 // Music app
-const AppMusic = {
+window.AppMusic = {
   playing: false,
   currentTrack: 0,
   tracks: [
@@ -17,7 +17,7 @@ const AppMusic = {
     container.innerHTML = `
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="display:flex;flex:1;overflow:hidden;gap:1px;">
-          <div style="width:260px;border-right:1px solid rgba(0,0,0,0.08);overflow-y:auto;flex-shrink:0;" id="music-sidebar">
+          <div style="width:260px;border-right:1px solid var(--window-border, rgba(0,0,0,0.08));overflow-y:auto;flex-shrink:0;" id="music-sidebar">
             <div class="app-list-item" style="font-weight:600;">📚 Library</div>
             <div class="app-list-item">🎵 Recently Added</div>
             <div class="app-list-item">❤️ Favorites</div>
@@ -29,18 +29,18 @@ const AppMusic = {
                 <span style="font-size:24px;">${t.emoji}</span>
                 <div style="flex:1;">
                   <div style="font-weight:500;">${AppUtils.escapeHtml(t.title)}</div>
-                  <div style="font-size:12px;color:#666;">${AppUtils.escapeHtml(t.artist)}</div>
+                  <div style="font-size:12px;color:var(--content-text-secondary, #666);">${AppUtils.escapeHtml(t.artist)}</div>
                 </div>
-                <span style="font-size:12px;color:#999;">${t.duration}</span>
+                <span style="font-size:12px;color:var(--content-text-tertiary, #999);">${t.duration}</span>
               </div>
             `).join('')}
           </div>
         </div>
-        <div style="background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.08);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;" id="music-player">
+        <div style="background:var(--panel-bg, rgba(255,255,255,0.9));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--window-border, rgba(0,0,0,0.08));padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;" id="music-player">
           <span style="font-size:28px;" id="music-playing-icon">🎵</span>
           <div style="flex:1;">
             <div style="font-weight:500;font-size:13px;" id="music-playing-title">Select a track</div>
-            <div style="font-size:11px;color:#666;" id="music-playing-artist"></div>
+            <div style="font-size:11px;color:var(--content-text-secondary, #666);" id="music-playing-artist"></div>
           </div>
           <div style="display:flex;gap:8px;">
             <button class="app-btn" id="music-prev">⏮</button>
@@ -70,21 +70,21 @@ const AppMusic = {
 
     container.querySelector('#music-prev').addEventListener('click', () => {
       this.currentTrack = (this.currentTrack - 1 + this.tracks.length) % this.tracks.length;
-      this.playTrack(container, this.currentTrack);
+      this.playTrack(container, this.currentTrack, false);
     });
 
     container.querySelector('#music-next').addEventListener('click', () => {
       this.currentTrack = (this.currentTrack + 1) % this.tracks.length;
-      this.playTrack(container, this.currentTrack);
+      this.playTrack(container, this.currentTrack, false);
     });
   },
 
-  playTrack(container, index) {
+  playTrack(container, index, autoplay = true) {
     const track = this.tracks[index];
     container.querySelector('#music-playing-title').textContent = track.title;
     container.querySelector('#music-playing-artist').textContent = track.artist;
     container.querySelector('#music-playing-icon').textContent = track.emoji;
-    this.playing = true;
-    container.querySelector('#music-play').textContent = '⏸️';
+    if (autoplay) this.playing = true;
+    container.querySelector('#music-play').textContent = this.playing ? '⏸️' : '▶️';
   }
 };

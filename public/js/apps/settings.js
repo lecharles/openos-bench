@@ -1,5 +1,5 @@
 // System Settings app
-const AppSettings = {
+window.AppSettings = {
   async render(container) {
     const settings = await Persistence.getSettings();
 
@@ -66,11 +66,11 @@ const AppSettings = {
       `,
       desktop: `
         <h2 class="app-settings-heading">Desktop &amp; Dock</h2>
-        <p style="color:var(--content-text-secondary);">Dock and desktop configuration options.</p>
+        <p style="color:var(--content-text-secondary);">Dock size and desktop configuration are not available in this build.</p>
       `,
       notifications: `
         <h2 class="app-settings-heading">Notifications</h2>
-        <p style="color:var(--content-text-secondary);">Manage notification preferences.</p>
+        <p style="color:var(--content-text-secondary);">Notification preferences are not available in this build.</p>
       `,
       about: `
         <h2 class="app-settings-heading">About KiMi Desktop</h2>
