@@ -4,10 +4,16 @@ const WindowManager = {
   zIndex: 100,
   focusedWindow: null,
   container: null,
+  _saveTimer: null,
 
   init() {
     this.container = document.getElementById('windows-container');
     this.loadSaved();
+  },
+
+  _debouncedSave() {
+    clearTimeout(this._saveTimer);
+    this._saveTimer = setTimeout(() => this.saveWindows(), 300);
   },
 
   open(appId, title, opts = {}) {
@@ -27,7 +33,7 @@ const WindowManager = {
     win.key = key;
     this.windows[key] = win;
     this.focus(win);
-    this.saveWindows();
+    this._debouncedSave();
     Dock.setRunning(appId, true);
     return win;
   },
@@ -118,7 +124,7 @@ const WindowManager = {
       if (dragging) {
         dragging = false;
         el.classList.remove('dragging');
-        WindowManager.saveWindows();
+        WindowManager._debouncedSave();
       }
     });
     titlebar.addEventListener('dblclick', (e) => {
@@ -150,7 +156,7 @@ const WindowManager = {
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup', onUp);
           el.classList.remove('resizing');
-          WindowManager.saveWindows();
+          WindowManager._debouncedSave();
         };
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
@@ -195,7 +201,7 @@ const WindowManager = {
       winObj.el.classList.add('maximized');
       winObj.maximized = true;
     }
-    this.saveWindows();
+    this._debouncedSave();
   },
 
   minimize(winObj) {
@@ -204,7 +210,7 @@ const WindowManager = {
       this.focusedWindow = null;
       document.getElementById('active-app-menu').textContent = '';
     }
-    this.saveWindows();
+    this._debouncedSave();
   },
 
   close(winObj) {
@@ -225,40 +231,18 @@ const WindowManager = {
     setTimeout(() => {
       if (winObj.el.parentNode) winObj.el.remove();
     }, 160);
-    this.saveWindows();
+    this._debouncedSave();
   },
 
   renderApp(winObj, appId, opts) {
-    // Each app module handles its own rendering
-    const renderers = {
-      finder: () => AppFinder && AppFinder.render(winObj.content, opts),
-      calendar: () => AppCalendar && AppCalendar.render(winObj.content),
-      notes: () => AppNotes && AppNotes.render(winObj.content),
-      clock: () => AppClock && AppClock.render(winObj.content),
-      calculator: () => AppCalculator && AppCalculator.render(winObj.content),
-      weather: () => AppWeather && AppWeather.render(winObj.content),
-      mail: () => AppMail && AppMail.render(winObj.content),
-      messages: () => AppMessages && AppMessages.render(winObj.content),
-      contacts: () => AppContacts && AppContacts.render(winObj.content),
-      photos: () => AppPhotos && AppPhotos.render(winObj.content),
-      music: () => AppMusic && AppMusic.render(winObj.content),
-      reminders: () => AppReminders && AppReminders.render(winObj.content),
-      preview: () => AppPreview && AppPreview.render(winObj.content),
-      textedit: () => AppTextEdit && AppTextEdit.render(winObj.content),
-      activity: () => AppActivity && AppActivity.render(winObj.content),
-      settings: () => AppSettings && AppSettings.render(winObj.content),
-      terminal: () => AppTerminal && AppTerminal.render(winObj.content),
-      trash: () => AppTrash && AppTrash.render(winObj.content),
-      hermes: () => AppHermes && AppHermes.render(winObj.content),
-      openclaw: () => AppOpenClaw && AppOpenClaw.render(winObj.content),
-      agentcontrol: () => AppAgentControl && AppAgentControl.render(winObj.content),
-    };
-    const render = renderers[appId];
-    if (render) {
-      // Allow DOM to settle
-      setTimeout(() => render(), 50);
+    // Use dynamic app lookup via AppRegistry
+    const appMeta = AppRegistry.get(appId);
+    const renderFn = window['App' + appId.charAt(0).toUpperCase() + appId.slice(1)];
+
+    if (renderFn && typeof renderFn.render === 'function') {
+      setTimeout(() => renderFn.render(winObj.content, opts), 50);
     } else {
-      winObj.content.innerHTML = `<div class="app-empty">Application "${appId}" is loading...</div>`;
+      winObj.content.innerHTML = `<div class="app-empty">"${appMeta.name}" is loading...</div>`;
     }
   },
 

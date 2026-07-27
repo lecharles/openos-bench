@@ -1,10 +1,71 @@
 # KiMi Browser Desktop — Status
 
-## Current Status: **Phase 4 — Apple Design Pass Complete**
+## Current Status: **Phase 5 — Performance & Engineering Complete**
 
 **Last Updated:** 2026-07-27 UTC
 
-**Build:** Verified — visual refinement pass applied, 40 source files.
+**Build:** Verified — performance optimization, engineering quality pass applied. All 27 API tests pass.
+
+## Phase 5: Performance & Engineering Quality
+
+### Engineering Decisions & Rationale
+
+#### Server Architecture
+- **Modular route structure**: Extracted CRUD routes, filesystem routes, and agent proxy routes into `routes/` directory (`persistence.js`, `fs.js`, `agent.js`)
+- **Async file I/O**: Replaced all synchronous `fs.readFileSync`/`fs.writeFileSync` with async `fs/promises` equivalents — prevents event loop blocking under load
+- **Path traversal protection**: Added `isPathSafe()` validation in `routes/fs.js` — restricts filesystem access to a whitelist of base directories
+- **Input validation**: Reusable CRUD route factory with optional validation; terminal commands filtered for dangerous patterns
+- **Agent proxy timeouts**: All outbound agent requests use `AbortController` with configurable timeouts; prevents hanging connections
+- **Health endpoint**: Added `/api/health` returning uptime and memory usage
+- **Request logging**: Non-production environments log method, path, status, and response time
+
+#### Frontend Architecture
+- **AppRegistry**: Centralized app metadata in `public/js/core/app-registry.js` — eliminates 4 duplicate app lists
+- **AppUtils**: Shared utility module with `escapeHtml()`, `renderMarkdown()`, `formatSize()`, `getFileIcon()`, `debounce()`, and typed API helpers
+- **Dynamic app rendering**: Convention-based lookup instead of 21-entry hardcoded switch statement
+
+#### CSS Engineering
+- **Reusable class system**: 50+ semantic CSS classes covering app layouts, chat, terminal, settings, agent control
+- **Design token references**: Remaining inline styles use `var(--*)` instead of hardcoded values
+- **Single-file approach preserved**: 41 app components sharing a common token system benefit from a single CSS source
+
+#### Performance Optimizations
+- **Debounced window saves**: `saveWindows()` debounced to 300ms — reduces write frequency
+- **Dock magnification via rAF**: Mouse movement throttled through `requestAnimationFrame` with cached DOM references
+- **Deferred script loading**: All app/core scripts use `defer` attribute — HTML parsing unblocks immediately
+- **Preconnect hint**: `<link rel="preconnect">` for faster static asset fetching
+
+#### Security Hardening
+- **Path traversal protection**: Filesystem endpoints validate paths against allowed roots
+- **XSS prevention**: `AppUtils.escapeHtml()` used consistently across all apps rendering user content
+- **Command injection blocking**: Terminal endpoint filters dangerous commands
+- **File size limits**: Read endpoint rejects files >1MB
+- **Timeout isolation**: Agent failures cannot block the event loop
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `server.js` | Rewrite — async IO, modular routes, validation, health endpoint, error handler |
+| `routes/persistence.js` | **New** — generic CRUD route factory |
+| `routes/fs.js` | **New** — filesystem routes with path traversal protection |
+| `routes/agent.js` | **New** — agent proxy routes with timeouts |
+| `public/js/core/app-registry.js` | **New** — centralized app metadata + AppUtils |
+| `public/js/core/dock.js` | rAF-throttled magnification, cached DOM refs |
+| `public/js/core/window-manager.js` | Debounced saves, dynamic app rendering |
+| `public/js/core/spotlight.js` | Uses AppRegistry |
+| `public/js/core/launchpad.js` | Uses AppRegistry |
+| `public/js/apps/finder.js` | CSS classes, AppUtils |
+| `public/js/apps/notes.js` | CSS classes, AppUtils |
+| `public/js/apps/terminal.js` | CSS classes, AppUtils |
+| `public/js/apps/hermes.js` | CSS classes, AppUtils |
+| `public/js/apps/openclaw.js` | CSS classes, AppUtils |
+| `public/js/apps/mail.js` | CSS classes, AppUtils |
+| `public/js/apps/messages.js` | CSS classes, AppUtils |
+| `public/js/apps/contacts.js` | CSS classes, AppUtils |
+| `public/js/apps/settings.js` | CSS classes, design tokens |
+| `public/js/apps/agentcontrol.js` | CSS classes, AppUtils |
+| `public/css/style.css` | ~130 new CSS class definitions for app patterns |
+| `public/index.html` | Preconnect, defer scripts, app-registry include |
 
 ## Phase 4: Apple Human Interface Design Pass
 

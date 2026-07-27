@@ -76,35 +76,12 @@ const Spotlight = {
     }
 
     const q = query.toLowerCase();
-    const apps = [
-      { name: 'Finder', icon: '📁', app: 'finder' },
-      { name: 'Calendar', icon: '📅', app: 'calendar' },
-      { name: 'Notes', icon: '📝', app: 'notes' },
-      { name: 'Clock', icon: '🕐', app: 'clock' },
-      { name: 'Calculator', icon: '🔢', app: 'calculator' },
-      { name: 'Weather', icon: '🌤️', app: 'weather' },
-      { name: 'Mail', icon: '📧', app: 'mail' },
-      { name: 'Messages', icon: '💬', app: 'messages' },
-      { name: 'Contacts', icon: '👤', app: 'contacts' },
-      { name: 'Photos', icon: '🖼️', app: 'photos' },
-      { name: 'Music', icon: '🎵', app: 'music' },
-      { name: 'Reminders', icon: '✅', app: 'reminders' },
-      { name: 'Preview', icon: '👁️', app: 'preview' },
-      { name: 'Text Editor', icon: '📄', app: 'textedit' },
-      { name: 'Activity Monitor', icon: '📊', app: 'activity' },
-      { name: 'System Settings', icon: '⚙️', app: 'settings' },
-      { name: 'Terminal', icon: '⬛', app: 'terminal' },
-      { name: 'Trash', icon: '🗑️', app: 'trash' },
-      { name: 'Hermes', icon: '🧠', app: 'hermes' },
-      { name: 'OpenClaw', icon: '🦞', app: 'openclaw' },
-      { name: 'Agent Control', icon: '🛡️', app: 'agentcontrol' },
-    ];
-
+    const apps = AppRegistry.all();
     this.results = apps.filter(a => a.name.toLowerCase().includes(q));
     this.selectedIndex = this.results.length > 0 ? 0 : -1;
 
     resultsEl.innerHTML = this.results.map((a, i) =>
-      `<div class="spotlight-result${i === this.selectedIndex ? ' selected' : ''}" data-app="${a.app}">
+      `<div class="spotlight-result${i === this.selectedIndex ? ' selected' : ''}" data-app="${a.id}">
         <span class="sr-icon">${a.icon}</span>
         <span class="sr-name">${a.name}</span>
         <span class="sr-hint">Application</span>

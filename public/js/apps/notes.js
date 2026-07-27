@@ -6,13 +6,18 @@ const AppNotes = {
   async render(container) {
     await this.loadNotes();
     container.innerHTML = `
-      <div style="display:flex;height:100%;gap:1px;">
-        <div style="width:220px;border-right:1px solid rgba(0,0,0,0.08);overflow-y:auto;flex-shrink:0;" id="notes-sidebar"></div>
-        <div style="flex:1;display:flex;flex-direction:column;" id="notes-editor-area">
-          <div class="app-empty" id="notes-placeholder">Select a note or create a new one</div>
-          <div id="notes-editor" style="display:none;flex:1;display:none;flex-direction:column;padding:0 0 0 16px;">
-            <input type="text" id="notes-title" class="app-input" placeholder="Title" style="font-size:18px;font-weight:600;margin-bottom:8px;border:none;padding:4px 0;">
-            <textarea id="notes-body" class="app-input" placeholder="Start writing..." style="flex:1;border:none;font-size:14px;padding:4px 0;resize:none;"></textarea>
+      <div class="app-split">
+        <div class="app-sidebar">
+          <div class="app-sidebar-header">
+            <button class="app-btn primary" id="notes-new" style="width:100%;">+ New Note</button>
+          </div>
+          <div class="app-sidebar-list" id="notes-sidebar-list"></div>
+        </div>
+        <div class="app-detail" id="notes-editor-area">
+          <div class="app-notes-placeholder" id="notes-placeholder">Select a note or create a new one</div>
+          <div id="notes-editor" style="display:none;flex:1;flex-direction:column;padding:0 16px;">
+            <input type="text" id="notes-title" class="app-notes-title" placeholder="Title">
+            <textarea id="notes-body" class="app-notes-body" placeholder="Start writing..."></textarea>
           </div>
         </div>
       </div>
@@ -34,27 +39,25 @@ const AppNotes = {
   },
 
   renderSidebar(container) {
-    const sidebar = container.querySelector('#notes-sidebar');
-    sidebar.innerHTML = `
-      <div style="padding:8px;">
-        <button class="app-btn primary" id="notes-new" style="width:100%;">+ New Note</button>
-      </div>
-      ${this.notes.map((n, i) => `
-        <div class="app-list-item notes-item" data-index="${i}">
-          <div>
-            <div style="font-weight:500;">${n.title || 'Untitled'}</div>
-            <div style="font-size:11px;color:#999;">${(n.body || '').substring(0, 40)}</div>
-          </div>
+    const list = container.querySelector('#notes-sidebar-list');
+    if (!list) return;
+    list.innerHTML = this.notes.map((n, i) => `
+      <div class="app-sidebar-item notes-item${this.selectedNote === i ? ' active' : ''}" data-index="${i}">
+        <div>
+          <div class="item-title">${AppUtils.escapeHtml(n.title || 'Untitled')}</div>
+          <div class="item-preview">${AppUtils.escapeHtml((n.body || '').substring(0, 40))}</div>
         </div>
-      `).join('')}
-    `;
+      </div>
+    `).join('');
   },
 
   setupListeners(container) {
-    container.querySelector('#notes-new').addEventListener('click', () => {
+    container.querySelector('#notes-new')?.addEventListener('click', () => {
       this.notes.unshift({ title: '', body: '' });
+      this.selectedNote = 0;
       this.selectNote(container, 0);
       this.renderSidebar(container);
+      this.setupListeners(container);
     });
 
     container.querySelectorAll('.notes-item').forEach(el => {
@@ -65,9 +68,10 @@ const AppNotes = {
 
     const titleEl = container.querySelector('#notes-title');
     const bodyEl = container.querySelector('#notes-body');
-    if (titleEl) {
-      titleEl.addEventListener('input', () => this.updateCurrentNote(container));
-      bodyEl.addEventListener('input', () => this.updateCurrentNote(container));
+    if (titleEl && bodyEl) {
+      const save = () => this.updateCurrentNote(container);
+      titleEl.addEventListener('input', save);
+      bodyEl.addEventListener('input', save);
     }
   },
 
@@ -85,6 +89,14 @@ const AppNotes = {
     const bodyEl = container.querySelector('#notes-body');
     if (titleEl) titleEl.value = note.title || '';
     if (bodyEl) bodyEl.value = note.body || '';
+
+    // Update active state in sidebar
+    const sidebar = container.querySelector('#notes-sidebar-list');
+    if (sidebar) {
+      sidebar.querySelectorAll('.notes-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
   },
 
   updateCurrentNote(container) {

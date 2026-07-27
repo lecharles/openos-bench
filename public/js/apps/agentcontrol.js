@@ -1,4 +1,4 @@
-// Agent Control app - health, status, restart, diagnostics
+// Agent Control app
 const AppAgentControl = {
   agents: [
     { id: 'hermes', name: 'Hermes', icon: '🧠', port: 8400 },
@@ -8,23 +8,23 @@ const AppAgentControl = {
   render(container) {
     container.innerHTML = `
       <div class="app-toolbar">
-        <span style="font-weight:600;font-size:16px;">🛡️ Agent Control</span>
-        <span style="flex:1;"></span>
+        <span class="app-toolbar-title" style="font-size:var(--text-subheadline);">🛡️ Agent Control</span>
+        <span class="app-spacer"></span>
         <button class="app-btn" id="ac-refresh">🔄 Refresh All</button>
       </div>
-      <div id="ac-agents">
+      <div id="ac-agents" style="padding:var(--space-3);">
         ${this.agents.map(a => `
-          <div class="ac-agent-card" data-agent="${a.id}" style="background:rgba(0,0,0,0.03);border-radius:10px;padding:16px;margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-              <span style="font-size:32px;">${a.icon}</span>
-              <div style="flex:1;">
-                <div style="font-weight:600;font-size:15px;">${a.name}</div>
-                <div style="font-size:11px;color:#666;">Port: ${a.port}</div>
+          <div class="ac-agent-card" data-agent="${a.id}">
+            <div class="ac-agent-header">
+              <span class="ac-agent-icon">${a.icon}</span>
+              <div class="ac-agent-info">
+                <div class="ac-agent-name">${AppUtils.escapeHtml(a.name)}</div>
+                <div class="ac-agent-port">Port: ${a.port}</div>
               </div>
-              <span class="ac-status" style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,0.06);">Checking...</span>
+              <span class="ac-agent-status app-status offline">Checking...</span>
             </div>
-            <div class="ac-details" style="font-size:12px;color:#666;margin-bottom:12px;"></div>
-            <div style="display:flex;gap:8px;">
+            <div class="ac-agent-details"></div>
+            <div class="ac-agent-actions">
               <button class="app-btn ac-health" data-agent="${a.id}">Health Check</button>
               <button class="app-btn ac-status-btn" data-agent="${a.id}">Status</button>
               <button class="app-btn ac-restart" data-agent="${a.id}">Restart</button>
@@ -33,8 +33,8 @@ const AppAgentControl = {
           </div>
         `).join('')}
       </div>
-      <div id="ac-log" style="margin-top:12px;background:rgba(0,0,0,0.03);border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:monospace;font-size:11px;display:none;">
-        <div style="font-weight:600;margin-bottom:8px;">Diagnostic Log</div>
+      <div class="ac-log" id="ac-log" style="display:none;">
+        <div style="font-weight:var(--weight-semibold);margin-bottom:var(--space-2);">Diagnostic Log</div>
         <div id="ac-log-content"></div>
       </div>
     `;
@@ -49,20 +49,17 @@ const AppAgentControl = {
     container.querySelectorAll('.ac-health').forEach(btn => {
       btn.addEventListener('click', async () => {
         const agent = btn.dataset.agent;
-        const statusEl = container.querySelector(`.ac-agent-card[data-agent="${agent}"] .ac-status`);
-        const detailsEl = container.querySelector(`.ac-agent-card[data-agent="${agent}"] .ac-details`);
+        const card = container.querySelector(`.ac-agent-card[data-agent="${agent}"]`);
+        const statusEl = card?.querySelector('.ac-agent-status');
+        const detailsEl = card?.querySelector('.ac-agent-details');
         try {
           const resp = await fetch(`/api/agent/${agent}/health`);
           const data = await resp.json();
-          statusEl.textContent = 'Healthy';
-          statusEl.style.background = 'rgba(40,200,64,0.15)';
-          statusEl.style.color = '#28c840';
-          detailsEl.textContent = JSON.stringify(data);
+          if (statusEl) { statusEl.textContent = 'Healthy'; statusEl.className = 'ac-agent-status app-status online'; }
+          if (detailsEl) detailsEl.textContent = JSON.stringify(data);
         } catch {
-          statusEl.textContent = 'Unreachable';
-          statusEl.style.background = 'rgba(255,95,87,0.15)';
-          statusEl.style.color = '#ff5f57';
-          detailsEl.textContent = 'Agent is not responding';
+          if (statusEl) { statusEl.textContent = 'Unreachable'; statusEl.className = 'ac-agent-status app-status offline'; }
+          if (detailsEl) detailsEl.textContent = 'Agent is not responding';
         }
       });
     });
@@ -70,13 +67,14 @@ const AppAgentControl = {
     container.querySelectorAll('.ac-status-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const agent = btn.dataset.agent;
-        const detailsEl = container.querySelector(`.ac-agent-card[data-agent="${agent}"] .ac-details`);
+        const card = container.querySelector(`.ac-agent-card[data-agent="${agent}"]`);
+        const detailsEl = card?.querySelector('.ac-agent-details');
         try {
           const resp = await fetch(`/api/agent/${agent}/status`);
           const data = await resp.json();
-          detailsEl.textContent = JSON.stringify(data, null, 2);
+          if (detailsEl) detailsEl.textContent = JSON.stringify(data, null, 2);
         } catch {
-          detailsEl.textContent = 'Status unavailable';
+          if (detailsEl) detailsEl.textContent = 'Status unavailable';
         }
       });
     });
@@ -84,18 +82,15 @@ const AppAgentControl = {
     container.querySelectorAll('.ac-restart').forEach(btn => {
       btn.addEventListener('click', async () => {
         const agent = btn.dataset.agent;
-        const statusEl = container.querySelector(`.ac-agent-card[data-agent="${agent}"] .ac-status`);
+        const card = container.querySelector(`.ac-agent-card[data-agent="${agent}"]`);
+        const statusEl = card?.querySelector('.ac-agent-status');
         if (!confirm(`Restart ${agent} agent?`)) return;
-        statusEl.textContent = 'Restarting...';
-        statusEl.style.background = 'rgba(254,188,46,0.15)';
-        statusEl.style.color = '#febc2e';
+        if (statusEl) { statusEl.textContent = 'Restarting...'; statusEl.className = 'ac-agent-status app-status offline'; statusEl.style.color = '#febc2e'; }
         try {
           await fetch(`/api/agent/${agent}/restart`, { method: 'POST' });
           setTimeout(() => this.refreshAll(container), 2000);
         } catch {
-          statusEl.textContent = 'Restart failed';
-          statusEl.style.background = 'rgba(255,95,87,0.15)';
-          statusEl.style.color = '#ff5f57';
+          if (statusEl) { statusEl.textContent = 'Restart failed'; statusEl.className = 'ac-agent-status app-status offline'; }
         }
       });
     });
@@ -108,7 +103,6 @@ const AppAgentControl = {
         log.style.display = 'block';
         logContent.innerHTML = `Running diagnostics for ${agent}...\n`;
 
-        // Collect diagnostics
         const results = [];
         const addResult = (label, success, detail) => {
           const icon = success ? '✅' : '❌';
@@ -138,22 +132,22 @@ const AppAgentControl = {
 
   async refreshAll(container) {
     for (const agent of this.agents) {
-      const statusEl = container.querySelector(`.ac-agent-card[data-agent="${agent.id}"] .ac-status`);
+      const card = container.querySelector(`.ac-agent-card[data-agent="${agent.id}"]`);
+      const statusEl = card?.querySelector('.ac-agent-status');
+      if (!statusEl) continue;
       try {
         const resp = await fetch(`/api/agent/${agent.id}/health`);
         if (resp.ok) {
           statusEl.textContent = 'Healthy';
-          statusEl.style.background = 'rgba(40,200,64,0.15)';
-          statusEl.style.color = '#28c840';
+          statusEl.className = 'ac-agent-status app-status online';
         } else {
           statusEl.textContent = 'Unhealthy';
-          statusEl.style.background = 'rgba(255,149,0,0.15)';
+          statusEl.className = 'ac-agent-status app-status offline';
           statusEl.style.color = '#ff9500';
         }
       } catch {
         statusEl.textContent = 'Offline';
-        statusEl.style.background = 'rgba(255,95,87,0.15)';
-        statusEl.style.color = '#ff5f57';
+        statusEl.className = 'ac-agent-status app-status offline';
       }
     }
   }

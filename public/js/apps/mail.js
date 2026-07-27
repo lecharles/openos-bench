@@ -7,29 +7,29 @@ const AppMail = {
     if (this.emails.length === 0) this.seedEmails();
 
     container.innerHTML = `
-      <div style="display:flex;height:100%;gap:1px;">
-        <div style="width:200px;border-right:1px solid rgba(0,0,0,0.08);overflow-y:auto;flex-shrink:0;padding:8px;" id="mail-sidebar">
-          <button class="app-btn primary" id="mail-compose" style="width:100%;margin-bottom:12px;">✏️ Compose</button>
-          <div class="app-list-item" style="font-weight:600;">📥 Inbox</div>
+      <div class="app-split">
+        <div class="app-sidebar" style="width:200px;padding:var(--space-2);">
+          <button class="app-btn primary" id="mail-compose" style="width:100%;margin-bottom:var(--space-3);">✏️ Compose</button>
+          <div class="app-list-item" style="font-weight:var(--weight-semibold);">📥 Inbox</div>
           <div class="app-list-item">📤 Sent</div>
           <div class="app-list-item">📝 Drafts</div>
           <div class="app-list-item">🗑️ Trash</div>
         </div>
-        <div style="flex:1;overflow-y:auto;padding:0;" id="mail-list">
+        <div class="app-list" style="flex:1;overflow-y:auto;" id="mail-list">
           ${this.emails.map((e, i) => `
-            <div class="app-list-item mail-item" data-index="${i}" style="border-bottom:1px solid rgba(0,0,0,0.04);padding:12px;">
+            <div class="app-list-item mail-item" data-index="${i}" style="border-bottom:0.5px solid var(--separator);padding:var(--space-3);">
               <div style="width:100%;">
                 <div style="display:flex;justify-content:space-between;">
-                  <span style="font-weight:${e.read ? '400' : '600'};">${e.from}</span>
-                  <span style="font-size:11px;color:#999;">${e.time}</span>
+                  <span style="font-weight:${e.read ? 'var(--weight-regular)' : 'var(--weight-semibold)'};">${AppUtils.escapeHtml(e.from)}</span>
+                  <span style="font-size:var(--text-caption);color:var(--content-text-tertiary);">${AppUtils.escapeHtml(e.time)}</span>
                 </div>
-                <div style="font-weight:${e.read ? '400' : '600'};">${e.subject}</div>
-                <div style="font-size:12px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.body}</div>
+                <div style="font-weight:${e.read ? 'var(--weight-regular)' : 'var(--weight-semibold)'};">${AppUtils.escapeHtml(e.subject)}</div>
+                <div style="font-size:12px;color:var(--content-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${AppUtils.escapeHtml(e.body)}</div>
               </div>
             </div>
           `).join('')}
         </div>
-        <div style="width:300px;border-left:1px solid rgba(0,0,0,0.08);padding:16px;overflow-y:auto;display:none;" id="mail-detail">
+        <div style="width:300px;border-left:0.5px solid var(--separator);padding:var(--space-4);overflow-y:auto;display:none;" id="mail-detail">
           <div id="mail-detail-content"></div>
         </div>
       </div>
@@ -64,11 +64,11 @@ const AppMail = {
         const content = container.querySelector('#mail-detail-content');
         detail.style.display = 'block';
         content.innerHTML = `
-          <h2 style="font-size:18px;margin-bottom:4px;">${email.subject}</h2>
-          <div style="color:#666;margin-bottom:4px;">From: ${email.from}</div>
-          <div style="color:#999;font-size:12px;margin-bottom:16px;">${email.time}</div>
-          <hr style="border:none;border-top:1px solid rgba(0,0,0,0.08);margin-bottom:12px;">
-          <div style="line-height:1.6;">${email.body}</div>
+          <h2 style="font-size:var(--text-title3);margin-bottom:var(--space-1);">${AppUtils.escapeHtml(email.subject)}</h2>
+          <div style="color:var(--content-text-secondary);margin-bottom:var(--space-1);">From: ${AppUtils.escapeHtml(email.from)}</div>
+          <div style="color:var(--content-text-tertiary);font-size:var(--text-caption);margin-bottom:var(--space-4);">${AppUtils.escapeHtml(email.time)}</div>
+          <hr style="border:none;border-top:0.5px solid var(--separator);margin-bottom:var(--space-3);">
+          <div style="line-height:1.6;">${AppUtils.escapeHtml(email.body)}</div>
         `;
         fetch('/api/mail', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.emails) });
       });
@@ -79,11 +79,11 @@ const AppMail = {
       const content = container.querySelector('#mail-detail-content');
       detail.style.display = 'block';
       content.innerHTML = `
-        <h3>New Message</h3>
-        <input class="app-input" placeholder="To:" style="width:100%;margin-bottom:8px;">
-        <input class="app-input" placeholder="Subject:" style="width:100%;margin-bottom:8px;">
+        <h3 style="margin-bottom:var(--space-3);">New Message</h3>
+        <input class="app-input" placeholder="To:" style="width:100%;margin-bottom:var(--space-2);">
+        <input class="app-input" placeholder="Subject:" style="width:100%;margin-bottom:var(--space-2);">
         <textarea class="app-input" placeholder="Message..." style="width:100%;min-height:150px;"></textarea>
-        <button class="app-btn primary" style="margin-top:8px;">Send</button>
+        <button class="app-btn primary" style="margin-top:var(--space-2);">Send</button>
       `;
     });
   }

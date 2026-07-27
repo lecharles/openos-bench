@@ -9,10 +9,10 @@ const AppFinder = {
         <button id="finder-back">◀</button>
         <button id="finder-fwd">▶</button>
         <button id="finder-home">🏠 Home</button>
-        <span style="flex:1"></span>
-        <span id="finder-path" style="color:#666;font-size:11px;">${this.currentDir}</span>
+        <span class="app-spacer"></span>
+        <span id="finder-path" class="app-finder-path">${this.currentDir}</span>
       </div>
-      <div id="finder-list" class="app-list"></div>
+      <div id="finder-list" class="app-list" style="flex:1;overflow-y:auto;"></div>
     `;
 
     container.querySelector('#finder-back').addEventListener('click', () => {
@@ -25,12 +25,6 @@ const AppFinder = {
       this.currentDir = '/root';
       this.loadDir(container);
     });
-    container.querySelector('#finder-fwd').addEventListener('click', () => {});
-
-    // Context menu on items
-    container.querySelector('#finder-list').addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
 
     await this.loadDir(container);
   },
@@ -38,12 +32,12 @@ const AppFinder = {
   async loadDir(container) {
     const list = container.querySelector('#finder-list');
     const pathSpan = container.querySelector('#finder-path');
-    list.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Loading...</div>';
+    list.innerHTML = '<div class="app-empty">Loading...</div>';
 
     try {
       const resp = await fetch(`/api/fs?dir=${encodeURIComponent(this.currentDir)}`);
       const data = await resp.json();
-      if (data.error) { list.innerHTML = `<div class="app-empty">Error: ${data.error}</div>`; return; }
+      if (data.error) { list.innerHTML = `<div class="app-empty">Error: ${AppUtils.escapeHtml(data.error)}</div>`; return; }
 
       pathSpan.textContent = data.path;
       this.currentDir = data.path;
@@ -52,7 +46,7 @@ const AppFinder = {
       if (data.path !== '/') {
         const parentItem = document.createElement('div');
         parentItem.className = 'app-list-item';
-        parentItem.innerHTML = '<span style="font-size:20px;">📂</span> <span style="font-weight:500;">..</span>';
+        parentItem.innerHTML = '<span class="app-finder-item-icon">📂</span> <span style="font-weight:var(--weight-medium);">..</span>';
         parentItem.addEventListener('dblclick', () => {
           const parts = this.currentDir.split('/').filter(Boolean);
           parts.pop();
@@ -71,12 +65,12 @@ const AppFinder = {
       sorted.forEach(entry => {
         const item = document.createElement('div');
         item.className = 'app-list-item';
-        const icon = entry.type === 'directory' ? '📁' : this.getFileIcon(entry.name);
-        const sizeStr = entry.type === 'file' ? this.formatSize(entry.size) : '--';
+        const icon = entry.type === 'directory' ? '📁' : AppUtils.getFileIcon(entry.name);
+        const sizeStr = entry.type === 'file' ? AppUtils.formatSize(entry.size) : '--';
         item.innerHTML = `
-          <span style="font-size:20px;">${icon}</span>
-          <span style="flex:1;">${entry.name}</span>
-          <span style="color:#999;font-size:11px;">${sizeStr}</span>
+          <span class="app-finder-item-icon">${icon}</span>
+          <span class="app-finder-item-name">${AppUtils.escapeHtml(entry.name)}</span>
+          <span class="app-finder-item-size">${sizeStr}</span>
         `;
         item.addEventListener('dblclick', () => {
           if (entry.type === 'directory') {
@@ -93,25 +87,8 @@ const AppFinder = {
     }
   },
 
-  getFileIcon(name) {
-    const ext = name.split('.').pop().toLowerCase();
-    const map = { txt: '📄', md: '📝', json: '📋', js: '📜', py: '🐍', html: '🌐', css: '🎨',
-      png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', svg: '🖼️',
-      mp3: '🎵', wav: '🎵', mp4: '🎬', pdf: '📕', zip: '📦', tar: '📦', gz: '📦',
-      sh: '⚙️', yml: '⚙️', yaml: '⚙️', toml: '⚙️', lock: '🔒' };
-    return map[ext] || '📄';
-  },
-
-  formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  },
-
   async openFile(path, name) {
-    const ext = name.split('.').pop().toLowerCase();
-    const textExts = ['txt', 'md', 'json', 'js', 'py', 'html', 'css', 'yml', 'yaml', 'toml', 'sh', 'xml', 'log', 'env', 'cfg', 'ini', 'conf'];
-    if (textExts.includes(ext) || !ext) {
+    if (AppUtils.isTextFile(name)) {
       try {
         const resp = await fetch(`/api/fs/read?file=${encodeURIComponent(path)}`);
         const data = await resp.json();

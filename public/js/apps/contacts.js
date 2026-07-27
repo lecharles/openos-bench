@@ -9,7 +9,7 @@ const AppContacts = {
     container.innerHTML = `
       <div class="app-toolbar">
         <button class="app-btn primary" id="contacts-add">+ New Contact</button>
-        <input type="text" id="contacts-search" class="app-input" placeholder="Search contacts..." style="flex:1;margin-left:8px;">
+        <input type="text" id="contacts-search" class="app-input" placeholder="Search contacts..." style="flex:1;margin-left:var(--space-2);">
       </div>
       <div id="contacts-list" class="app-list"></div>
       <div id="contacts-editor" style="display:none;"></div>
@@ -41,11 +41,11 @@ const AppContacts = {
     const list = container.querySelector('#contacts-list');
     const filtered = filter ? this.contacts.filter(c => c.name.toLowerCase().includes(filter.toLowerCase())) : this.contacts;
     list.innerHTML = filtered.map((c, i) => `
-      <div class="app-list-item contacts-item" data-index="${i}" style="padding:10px 12px;">
-        <span style="font-size:28px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;">👤</span>
+      <div class="app-list-item contacts-item" data-index="${i}" style="padding:10px var(--space-3);">
+        <span style="font-size:28px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">👤</span>
         <div>
-          <div style="font-weight:500;">${c.name}</div>
-          <div style="font-size:12px;color:#666;">${c.phone} · ${c.email}</div>
+          <div style="font-weight:var(--weight-medium);">${AppUtils.escapeHtml(c.name)}</div>
+          <div style="font-size:12px;color:var(--content-text-secondary);">${AppUtils.escapeHtml(c.phone)} · ${AppUtils.escapeHtml(c.email)}</div>
         </div>
       </div>
     `).join('');
@@ -69,17 +69,17 @@ const AppContacts = {
     list.style.display = 'none';
     editor.style.display = 'block';
     editor.innerHTML = `
-      <h3>${index !== null ? 'Edit Contact' : 'New Contact'}</h3>
-      <div style="margin-top:12px;">
-        <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;">Name</label>
-        <input type="text" id="cedit-name" class="app-input" value="${contact.name}" style="width:100%;margin-bottom:8px;">
-        <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;">Phone</label>
-        <input type="text" id="cedit-phone" class="app-input" value="${contact.phone}" style="width:100%;margin-bottom:8px;">
-        <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;">Email</label>
-        <input type="text" id="cedit-email" class="app-input" value="${contact.email}" style="width:100%;margin-bottom:12px;">
+      <h3 style="margin-bottom:var(--space-3);">${index !== null ? 'Edit Contact' : 'New Contact'}</h3>
+      <div>
+        <label style="display:block;font-size:var(--text-caption);color:var(--content-text-secondary);margin-bottom:var(--space-1);">Name</label>
+        <input type="text" id="cedit-name" class="app-input" value="${AppUtils.escapeHtml(contact.name)}" style="width:100%;margin-bottom:var(--space-2);">
+        <label style="display:block;font-size:var(--text-caption);color:var(--content-text-secondary);margin-bottom:var(--space-1);">Phone</label>
+        <input type="text" id="cedit-phone" class="app-input" value="${AppUtils.escapeHtml(contact.phone)}" style="width:100%;margin-bottom:var(--space-2);">
+        <label style="display:block;font-size:var(--text-caption);color:var(--content-text-secondary);margin-bottom:var(--space-1);">Email</label>
+        <input type="text" id="cedit-email" class="app-input" value="${AppUtils.escapeHtml(contact.email)}" style="width:100%;margin-bottom:var(--space-3);">
         <button class="app-btn primary" id="cedit-save">Save</button>
         <button class="app-btn" id="cedit-cancel">Cancel</button>
-        ${index !== null ? '<button class="app-btn" id="cedit-delete" style="color:#ff3b30;">Delete</button>' : ''}
+        ${index !== null ? '<button class="app-btn" id="cedit-delete" style="color:var(--color-red);">Delete</button>' : ''}
       </div>
     `;
 

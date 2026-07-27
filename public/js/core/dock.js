@@ -2,10 +2,18 @@
 const Dock = {
   runningApps: {},
   items: [],
+  _dockItems: null,   // cached NodeList
+  _dockEl: null,
+  _containerEl: null,
+  _rafId: null,
+  _mouseX: -1,
 
   init() {
-    this.items = document.querySelectorAll('.dock-item');
-    this.items.forEach(item => {
+    this._dockEl = document.getElementById('dock');
+    this._containerEl = document.getElementById('dock-container');
+    this._dockItems = [...this._dockEl.querySelectorAll('.dock-item')];
+
+    this._dockItems.forEach(item => {
       const app = item.dataset.app;
       item.addEventListener('click', () => this.launch(app));
     });
@@ -13,78 +21,81 @@ const Dock = {
   },
 
   launch(appId) {
-    const titles = {
-      finder: 'Finder', calendar: 'Calendar', notes: 'Notes', clock: 'Clock',
-      calculator: 'Calculator', weather: 'Weather', mail: 'Mail', messages: 'Messages',
-      contacts: 'Contacts', photos: 'Photos', music: 'Music', reminders: 'Reminders',
-      preview: 'Preview', textedit: 'Text Editor', activity: 'Activity Monitor',
-      settings: 'System Settings', terminal: 'Terminal', trash: 'Trash',
-      hermes: 'Hermes', openclaw: 'OpenClaw', agentcontrol: 'Agent Control',
-    };
-    WindowManager.open(appId, titles[appId] || appId);
+    WindowManager.open(appId, AppRegistry.getTitle(appId));
   },
 
   setupMagnification() {
-    // Apply proximity-based magnification to dock items
-    const dock = document.getElementById('dock');
-    const container = document.getElementById('dock-container');
+    const container = this._containerEl;
 
+    // Use rAF-throttled handler for performance
     container.addEventListener('mousemove', (e) => {
-      const items = [...dock.querySelectorAll('.dock-item')];
-      const mouseX = e.clientX;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const dist = Math.abs(mouseX - centerX);
-        const maxDist = 120; // influence radius
-
-        if (dist < maxDist) {
-          const t = 1 - (dist / maxDist);
-          const scale = 1 + t * 0.25;
-          const width = 52 + t * 24;
-          item.style.width = width + 'px';
-          const icon = item.querySelector('.dock-icon');
-          if (icon) icon.style.transform = `scale(${scale})`;
-          const label = item.querySelector('.dock-label');
-          if (label) label.style.opacity = t > 0.5 ? 1 : 0;
-        } else {
-          item.style.width = '52px';
-          const icon = item.querySelector('.dock-icon');
-          if (icon) icon.style.transform = 'scale(1)';
-          const label = item.querySelector('.dock-label');
-          if (label) label.style.opacity = '0';
-        }
-      });
+      this._mouseX = e.clientX;
+      if (!this._rafId) {
+        this._rafId = requestAnimationFrame(() => this._updateMagnification());
+      }
     });
 
     container.addEventListener('mouseleave', () => {
-      const items = [...dock.querySelectorAll('.dock-item')];
-      items.forEach(item => {
-        item.style.width = '52px';
-        item.style.transition = 'width 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17), transform 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)';
-        const icon = item.querySelector('.dock-icon');
-        if (icon) { icon.style.transition = 'transform 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)'; icon.style.transform = 'scale(1)'; }
-        const label = item.querySelector('.dock-label');
-        if (label) label.style.opacity = '0';
-      });
-      setTimeout(() => {
-        items.forEach(item => {
-          item.style.transition = '';
-          const icon = item.querySelector('.dock-icon');
-          if (icon) icon.style.transition = '';
-        });
-      }, 310);
+      if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+      this._mouseX = -1;
+      this._resetMagnification();
     });
   },
 
-  setRunning(appId, running) {
-    const item = document.querySelector(`.dock-item[data-app="${appId}"]`);
-    if (!item) return;
-    if (running) {
-      item.classList.add('running');
-    } else {
-      item.classList.remove('running');
+  _updateMagnification() {
+    this._rafId = null;
+    const items = this._dockItems;
+    const mouseX = this._mouseX;
+    const maxDist = 120;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const rect = item.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const dist = Math.abs(mouseX - centerX);
+
+      if (dist < maxDist && mouseX >= 0) {
+        const t = 1 - (dist / maxDist);
+        const scale = 1 + t * 0.25;
+        const width = 52 + t * 24;
+        item.style.width = width + 'px';
+        const icon = item.querySelector('.dock-icon');
+        if (icon) icon.style.transform = `scale(${scale})`;
+        const label = item.querySelector('.dock-label');
+        if (label) label.style.opacity = t > 0.5 ? '1' : '0';
+      } else {
+        item.style.width = '52px';
+        const icon = item.querySelector('.dock-icon');
+        if (icon) icon.style.transform = 'scale(1)';
+        const label = item.querySelector('.dock-label');
+        if (label) label.style.opacity = '0';
+      }
     }
+  },
+
+  _resetMagnification() {
+    const items = this._dockItems;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      item.style.width = '52px';
+      item.style.transition = 'width 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)';
+      const icon = item.querySelector('.dock-icon');
+      if (icon) { icon.style.transition = 'transform 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)'; icon.style.transform = 'scale(1)'; }
+      const label = item.querySelector('.dock-label');
+      if (label) label.style.opacity = '0';
+    }
+    setTimeout(() => {
+      for (let i = 0; i < items.length; i++) {
+        items[i].style.transition = '';
+        const icon = items[i].querySelector('.dock-icon');
+        if (icon) icon.style.transition = '';
+      }
+    }, 310);
+  },
+
+  setRunning(appId, running) {
+    const item = this._dockEl.querySelector(`.dock-item[data-app="${appId}"]`);
+    if (!item) return;
+    item.classList.toggle('running', running);
   }
 };

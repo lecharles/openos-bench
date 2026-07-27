@@ -1,26 +1,26 @@
 // Messages app
 const AppMessages = {
-  messages: [],
+  messages: {},
   contacts: ['Alice', 'Bob', 'Carol', 'Dave', 'Eve'],
 
   render(container) {
-    if (this.messages.length === 0) this.seedMessages();
+    if (Object.keys(this.messages).length === 0) this.seedMessages();
 
     container.innerHTML = `
-      <div style="display:flex;height:100%;gap:1px;">
-        <div style="width:200px;border-right:1px solid rgba(0,0,0,0.08);overflow-y:auto;flex-shrink:0;" id="msg-contacts">
+      <div class="app-split">
+        <div class="app-sidebar" style="width:200px;" id="msg-contacts">
           ${this.contacts.map(c => `
-            <div class="app-list-item msg-contact" data-contact="${c}" style="padding:10px 12px;">
+            <div class="app-list-item msg-contact" data-contact="${c}" style="padding:10px var(--space-3);">
               <span style="font-size:24px;">👤</span>
-              <span style="font-weight:500;">${c}</span>
+              <span style="font-weight:var(--weight-medium);">${AppUtils.escapeHtml(c)}</span>
             </div>
           `).join('')}
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;" id="msg-chat-area">
+        <div class="app-column" style="flex:1;" id="msg-chat-area">
           <div class="app-empty" id="msg-placeholder">Select a conversation</div>
           <div id="msg-chat" style="display:none;flex:1;flex-direction:column;">
-            <div id="msg-messages" style="flex:1;overflow-y:auto;padding:12px;"></div>
-            <div style="display:flex;gap:8px;padding:12px;border-top:1px solid rgba(0,0,0,0.08);">
+            <div id="msg-messages" style="flex:1;overflow-y:auto;padding:var(--space-3);"></div>
+            <div style="display:flex;gap:var(--space-2);padding:var(--space-3);border-top:0.5px solid var(--separator);">
               <input type="text" id="msg-input" class="app-input" placeholder="Message" style="flex:1;">
               <button class="app-btn primary" id="msg-send">Send</button>
             </div>
@@ -35,8 +35,8 @@ const AppMessages = {
   seedMessages() {
     this.messages = {
       Alice: [
-        { from: 'Alice', text: 'Hey, are you coming to the meeting?', time: '10:15 AM' },
-        { from: 'me', text: 'Yes, I\'ll be there!', time: '10:16 AM' },
+        { from: 'Alice', text: "Hey, are you coming to the meeting?", time: '10:15 AM' },
+        { from: 'me', text: "Yes, I'll be there!", time: '10:16 AM' },
         { from: 'Alice', text: 'Great, see you then!', time: '10:17 AM' },
       ],
       Bob: [
@@ -88,16 +88,13 @@ const AppMessages = {
   renderMessages(container, contact) {
     const el = container.querySelector('#msg-messages');
     const msgs = this.messages[contact] || [];
-    el.innerHTML = msgs.map(m => `
-      <div style="margin-bottom:8px;text-align:${m.from === 'me' ? 'right' : 'left'};">
-        <div style="display:inline-block;max-width:70%;padding:8px 12px;border-radius:12px;font-size:13px;
-          background:${m.from === 'me' ? '#007AFF' : 'rgba(0,0,0,0.06)'};
-          color:${m.from === 'me' ? '#fff' : '#1d1d1f'};">
-          ${m.text}
-        </div>
-        <div style="font-size:10px;color:#999;margin-top:2px;">${m.time}</div>
-      </div>
-    `).join('');
+    el.innerHTML = msgs.map(m => {
+      const cls = m.from === 'me' ? 'me' : 'other';
+      return `<div style="margin-bottom:var(--space-2);text-align:${m.from === 'me' ? 'right' : 'left'};">
+        <div class="app-messages-bubble ${cls}">${AppUtils.escapeHtml(m.text)}</div>
+        <div class="app-messages-time">${AppUtils.escapeHtml(m.time)}</div>
+      </div>`;
+    }).join('');
     el.scrollTop = el.scrollHeight;
   }
 };

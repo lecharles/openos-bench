@@ -1,17 +1,16 @@
 // Terminal app
 const AppTerminal = {
-  history: [],
   cwd: '/root',
 
   render(container) {
     container.innerHTML = `
-      <div id="terminal-output" style="background:#1a1a2e;color:#00ff88;font-family:'SF Mono',Monaco,monospace;font-size:12px;padding:12px;min-height:300px;max-height:100%;overflow-y:auto;border-radius:6px;white-space:pre-wrap;line-height:1.5;">
+      <div class="app-terminal-output" id="terminal-output">
         <div style="color:#888;">KiMi Terminal — type 'help' for commands</div>
-        <div style="color:#888;">Current directory: ${this.cwd}</div>
+        <div style="color:#888;">Current directory: ${AppUtils.escapeHtml(this.cwd)}</div>
       </div>
-      <div style="display:flex;margin-top:8px;gap:8px;">
-        <span style="color:#00ff88;font-family:monospace;font-size:13px;padding:6px 0;">$</span>
-        <input type="text" id="terminal-input" class="app-input" style="flex:1;font-family:'SF Mono',Monaco,monospace;font-size:13px;background:#1a1a2e;color:#00ff88;border-color:#333;" placeholder="Enter command..." autofocus>
+      <div class="app-terminal-input-row">
+        <span class="app-terminal-prompt">$</span>
+        <input type="text" id="terminal-input" class="app-input app-terminal-input" placeholder="Enter command..." autofocus>
       </div>
     `;
 
@@ -24,18 +23,14 @@ const AppTerminal = {
         if (!cmd) return;
         input.value = '';
 
-        // Handle built-in commands
-        if (cmd === 'clear') {
-          output.innerHTML = '';
-          return;
-        }
+        if (cmd === 'clear') { output.innerHTML = ''; return; }
         if (cmd === 'help') {
           output.innerHTML += `\n<span style="color:#888;">Available commands: help, clear, pwd, cd &lt;dir&gt;, ls, and any shell command</span>`;
           output.scrollTop = output.scrollHeight;
           return;
         }
         if (cmd === 'pwd') {
-          output.innerHTML += `\n${this.cwd}`;
+          output.innerHTML += `\n${AppUtils.escapeHtml(this.cwd)}`;
           output.scrollTop = output.scrollHeight;
           return;
         }
@@ -50,12 +45,12 @@ const AppTerminal = {
           } else {
             this.cwd = this.cwd.replace(/\/$/, '') + '/' + target;
           }
-          output.innerHTML += `\n<span style="color:#888;">→ ${this.cwd}</span>`;
+          output.innerHTML += `\n<span style="color:#888;">→ ${AppUtils.escapeHtml(this.cwd)}</span>`;
           output.scrollTop = output.scrollHeight;
           return;
         }
 
-        output.innerHTML += `\n<span style="color:#fff;">$ ${cmd}</span>`;
+        output.innerHTML += `\n<span style="color:#fff;">$ ${AppUtils.escapeHtml(cmd)}</span>`;
 
         try {
           const resp = await fetch('/api/terminal', {
@@ -64,24 +59,17 @@ const AppTerminal = {
             body: JSON.stringify({ command: cmd, cwd: this.cwd })
           });
           const data = await resp.json();
-          if (data.stdout) output.innerHTML += `\n${this.escapeHtml(data.stdout)}`;
-          if (data.stderr) output.innerHTML += `\n<span style="color:#ff5f57;">${this.escapeHtml(data.stderr)}</span>`;
+          if (data.stdout) output.innerHTML += `\n${AppUtils.escapeHtml(data.stdout)}`;
+          if (data.stderr) output.innerHTML += `\n<span style="color:#ff5f57;">${AppUtils.escapeHtml(data.stderr)}</span>`;
           if (data.exitCode !== 0) output.innerHTML += `\n<span style="color:#ff5f57;">[exit: ${data.exitCode}]</span>`;
         } catch (e) {
-          output.innerHTML += `\n<span style="color:#ff5f57;">Error: ${e.message}</span>`;
+          output.innerHTML += `\n<span style="color:#ff5f57;">Error: ${AppUtils.escapeHtml(e.message)}</span>`;
         }
 
         output.scrollTop = output.scrollHeight;
       }
     });
 
-    // Focus input when clicking anywhere
     container.addEventListener('click', () => input.focus());
-  },
-
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
   }
 };
