@@ -15,8 +15,8 @@ const AppReminders = {
       <div id="rem-editor" style="display:none;"></div>
     `;
 
-    this.renderList(container);
-    this.setupListeners(container);
+    this._renderList(container);
+    this._setupListeners(container);
   },
 
   async loadReminders() {
@@ -27,8 +27,9 @@ const AppReminders = {
     await fetch('/api/reminders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.reminders) });
   },
 
-  renderList(container) {
+  _renderList(container) {
     const list = container.querySelector('#rem-list');
+    if (!list) return;
     if (this.reminders.length === 0) {
       list.innerHTML = '<div class="app-empty">No reminders</div>';
       return;
@@ -36,56 +37,56 @@ const AppReminders = {
     list.innerHTML = this.reminders.map((r, i) => `
       <div class="app-list-item" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">
         <input type="checkbox" ${r.done ? 'checked' : ''} data-index="${i}" class="rem-checkbox" style="width:18px;height:18px;cursor:pointer;">
-        <span style="flex:1;text-decoration:${r.done ? 'line-through' : 'none'};color:${r.done ? '#999' : '#1d1d1f'};">${r.title}</span>
-        <span style="font-size:11px;color:#999;">${r.date || ''}</span>
-        <button class="app-btn" data-del="${i}" style="font-size:10px;padding:2px 6px;">✕</button>
+        <span style="flex:1;text-decoration:${r.done ? 'line-through' : 'none'};color:${r.done ? '#999' : '#1d1d1f'};">${AppUtils.escapeHtml(r.title)}</span>
+        <span style="font-size:11px;color:#999;">${AppUtils.escapeHtml(r.date || '')}</span>
+        <button class="app-btn rem-del-btn" data-index="${i}" style="font-size:10px;padding:2px 6px;">✕</button>
       </div>
     `).join('');
-  },
 
-  setupListeners(container) {
-    container.querySelector('#rem-add').addEventListener('click', () => {
-      const editor = container.querySelector('#rem-editor');
-      editor.style.display = 'block';
-      editor.innerHTML = `
-        <input type="text" id="rem-title" class="app-input" placeholder="Reminder title" style="width:100%;margin-bottom:8px;">
-        <input type="date" id="rem-date" class="app-input" style="margin-bottom:8px;">
-        <button class="app-btn primary" id="rem-save">Save</button>
-        <button class="app-btn" id="rem-cancel">Cancel</button>
-      `;
-      editor.querySelector('#rem-save').addEventListener('click', () => {
-        const title = editor.querySelector('#rem-title').value;
-        const date = editor.querySelector('#rem-date').value;
-        if (title) {
-          this.reminders.push({ title, date, done: false });
-          this.saveReminders();
-          this.renderList(container);
-          this.setupListeners(container);
-          editor.style.display = 'none';
-        }
-      });
-      editor.querySelector('#rem-cancel').addEventListener('click', () => { editor.style.display = 'none'; });
-    });
-
-    // Re-attach checkboxes and delete buttons after render
-    container.querySelectorAll('.rem-checkbox').forEach(cb => {
+    // Bind per-item events here (DOM is fresh)
+    list.querySelectorAll('.rem-checkbox').forEach(cb => {
       cb.addEventListener('change', () => {
         const idx = parseInt(cb.dataset.index);
         this.reminders[idx].done = cb.checked;
         this.saveReminders();
-        this.renderList(container);
-        this.setupListeners(container);
+        this._renderList(container);
       });
     });
 
-    container.querySelectorAll('[data-del]').forEach(btn => {
+    list.querySelectorAll('.rem-del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.del);
+        const idx = parseInt(btn.dataset.index);
         this.reminders.splice(idx, 1);
         this.saveReminders();
-        this.renderList(container);
-        this.setupListeners(container);
+        this._renderList(container);
       });
     });
+  },
+
+  _setupListeners(container) {
+    const addBtn = container.querySelector('#rem-add');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        const editor = container.querySelector('#rem-editor');
+        editor.style.display = 'block';
+        editor.innerHTML = `
+          <input type="text" id="rem-title" class="app-input" placeholder="Reminder title" style="width:100%;margin-bottom:8px;">
+          <input type="date" id="rem-date" class="app-input" style="margin-bottom:8px;">
+          <button class="app-btn primary" id="rem-save">Save</button>
+          <button class="app-btn" id="rem-cancel">Cancel</button>
+        `;
+        editor.querySelector('#rem-save').addEventListener('click', () => {
+          const title = editor.querySelector('#rem-title').value;
+          const date = editor.querySelector('#rem-date').value;
+          if (title) {
+            this.reminders.push({ title, date, done: false });
+            this.saveReminders();
+            this._renderList(container);
+            editor.style.display = 'none';
+          }
+        });
+        editor.querySelector('#rem-cancel').addEventListener('click', () => { editor.style.display = 'none'; });
+      });
+    }
   }
 };

@@ -74,10 +74,12 @@ const AppFinder = {
         `;
         item.addEventListener('dblclick', () => {
           if (entry.type === 'directory') {
-            this.currentDir = this.currentDir.replace(/\/$/, '') + '/' + entry.name;
+            const base = this.currentDir.replace(/\/+$/, '');
+            this.currentDir = base + '/' + entry.name;
             this.loadDir(container);
           } else {
-            this.openFile(this.currentDir + '/' + entry.name, entry.name);
+            const base = this.currentDir.replace(/\/+$/, '');
+            this.openFile(base + '/' + entry.name, entry.name);
           }
         });
         list.appendChild(item);

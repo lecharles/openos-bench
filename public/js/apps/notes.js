@@ -2,6 +2,7 @@
 const AppNotes = {
   notes: [],
   selectedNote: null,
+  _renderDebounce: null,
 
   async render(container) {
     await this.loadNotes();
@@ -23,8 +24,8 @@ const AppNotes = {
       </div>
     `;
 
-    this.renderSidebar(container);
-    this.setupListeners(container);
+    this._renderSidebarOnly(container);
+    this._setupListeners(container);
   },
 
   async loadNotes() {
@@ -38,7 +39,7 @@ const AppNotes = {
     await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.notes) });
   },
 
-  renderSidebar(container) {
+  _renderSidebarOnly(container) {
     const list = container.querySelector('#notes-sidebar-list');
     if (!list) return;
     list.innerHTML = this.notes.map((n, i) => `
@@ -49,33 +50,38 @@ const AppNotes = {
         </div>
       </div>
     `).join('');
-  },
 
-  setupListeners(container) {
-    container.querySelector('#notes-new')?.addEventListener('click', () => {
-      this.notes.unshift({ title: '', body: '' });
-      this.selectedNote = 0;
-      this.selectNote(container, 0);
-      this.renderSidebar(container);
-      this.setupListeners(container);
-    });
-
-    container.querySelectorAll('.notes-item').forEach(el => {
+    // Re-bind sidebar item clicks (idempotent, replaces old DOM anyway)
+    list.querySelectorAll('.notes-item').forEach(el => {
       el.addEventListener('click', () => {
-        this.selectNote(container, parseInt(el.dataset.index));
+        this._selectNote(container, parseInt(el.dataset.index));
       });
     });
+  },
+
+  _setupListeners(container) {
+    const newBtn = container.querySelector('#notes-new');
+    if (newBtn) {
+      newBtn.addEventListener('click', () => {
+        this.notes.unshift({ title: '', body: '' });
+        this.selectedNote = 0;
+        this._selectNote(container, 0);
+        this._renderSidebarOnly(container);
+      });
+    }
+
+    // Sidebar items are bound in _renderSidebarOnly
 
     const titleEl = container.querySelector('#notes-title');
     const bodyEl = container.querySelector('#notes-body');
     if (titleEl && bodyEl) {
-      const save = () => this.updateCurrentNote(container);
+      const save = AppUtils.debounce(() => this._updateCurrentNote(container), 300);
       titleEl.addEventListener('input', save);
       bodyEl.addEventListener('input', save);
     }
   },
 
-  selectNote(container, index) {
+  _selectNote(container, index) {
     this.selectedNote = index;
     const note = this.notes[index];
     if (!note) return;
@@ -99,7 +105,7 @@ const AppNotes = {
     }
   },
 
-  updateCurrentNote(container) {
+  _updateCurrentNote(container) {
     if (this.selectedNote === null) return;
     const titleEl = container.querySelector('#notes-title');
     const bodyEl = container.querySelector('#notes-body');
@@ -108,7 +114,18 @@ const AppNotes = {
       body: bodyEl?.value || '',
     };
     this.saveNotes();
-    this.renderSidebar(container);
-    this.setupListeners(container);
+    // Only update sidebar preview text, don't re-bind everything
+    const list = container.querySelector('#notes-sidebar-list');
+    if (list && this.selectedNote !== null) {
+      const items = list.querySelectorAll('.notes-item');
+      const item = items[this.selectedNote];
+      if (item) {
+        const n = this.notes[this.selectedNote];
+        const title = item.querySelector('.item-title');
+        const preview = item.querySelector('.item-preview');
+        if (title) title.textContent = n.title || 'Untitled';
+        if (preview) preview.textContent = (n.body || '').substring(0, 40);
+      }
+    }
   }
 };

@@ -1,6 +1,6 @@
 // Activity Monitor app
 const AppActivity = {
-  timer: null,
+  _timer: null,
 
   render(container) {
     container.innerHTML = `
@@ -24,7 +24,17 @@ const AppActivity = {
     `;
 
     this.refresh(container);
-    this.timer = setInterval(() => this.refresh(container), 3000);
+    this._timer = setInterval(() => this.refresh(container), 3000);
+
+    // Register cleanup with window manager
+    const winEl = container.closest('.window');
+    if (winEl && winEl._winObj) {
+      winEl._winObj._cleanup = () => this.cleanup();
+    }
+  },
+
+  cleanup() {
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
   },
 
   async refresh(container) {

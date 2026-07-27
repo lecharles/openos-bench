@@ -214,6 +214,11 @@ const WindowManager = {
   },
 
   close(winObj) {
+    // Call app cleanup if defined
+    if (winObj._cleanup && typeof winObj._cleanup === 'function') {
+      try { winObj._cleanup(); } catch {}
+    }
+
     // Animate out
     winObj.el.style.transition = 'opacity 150ms cubic-bezier(0.2,0,0,1), transform 150ms cubic-bezier(0.2,0,0,1)';
     winObj.el.style.opacity = '0';

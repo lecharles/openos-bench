@@ -2,6 +2,7 @@
 const AppHermes = {
   history: [],
   streaming: false,
+  _agentInfo: { provider: '—', model: '—' },
 
   render(container) {
     container.innerHTML = `
@@ -9,9 +10,10 @@ const AppHermes = {
         <div class="app-toolbar">
           <span class="app-toolbar-title">🧠 Hermes</span>
           <span class="app-spacer"></span>
+          <span id="hermes-provider" style="font-size:11px;color:var(--content-text-tertiary);margin-right:8px;"></span>
           <span id="hermes-status" class="app-status offline">Checking...</span>
         </div>
-        <div class="app-chat" id="hermes-messages">${this.renderMessages()}</div>
+        <div class="app-chat" id="hermes-messages">${this._renderMessages()}</div>
         <div class="app-chat-input">
           <div class="app-chat-input-row">
             <textarea id="hermes-input" class="app-input" placeholder="Message Hermes..." rows="1"></textarea>
@@ -25,11 +27,11 @@ const AppHermes = {
       </div>
     `;
 
-    this.setupChat(container);
-    this.checkHealth(container);
+    this._setupChat(container);
+    this._checkHealth(container);
   },
 
-  renderMessages() {
+  _renderMessages() {
     if (this.history.length === 0) {
       return '<div class="app-empty">Start a conversation with Hermes</div>';
     }
@@ -39,7 +41,7 @@ const AppHermes = {
     }).join('');
   },
 
-  setupChat(container) {
+  _setupChat(container) {
     const input = container.querySelector('#hermes-input');
     const send = container.querySelector('#hermes-send');
     const messages = container.querySelector('#hermes-messages');
@@ -50,14 +52,14 @@ const AppHermes = {
       input.value = '';
 
       this.history.push({ role: 'user', content: text });
-      messages.innerHTML = this.renderMessages();
+      messages.innerHTML = this._renderMessages();
       messages.scrollTop = messages.scrollHeight;
 
       this.streaming = true;
       send.disabled = true;
       send.textContent = '...';
 
-      this.sendToAgent(text, container);
+      this._sendToAgent(text, container);
     };
 
     send.addEventListener('click', doSend);
@@ -67,15 +69,15 @@ const AppHermes = {
 
     container.querySelector('#hermes-clear').addEventListener('click', () => {
       this.history = [];
-      messages.innerHTML = this.renderMessages();
+      messages.innerHTML = this._renderMessages();
     });
 
     container.querySelector('#hermes-reconnect').addEventListener('click', () => {
-      this.checkHealth(container);
+      this._checkHealth(container);
     });
   },
 
-  async sendToAgent(text, container) {
+  async _sendToAgent(text, container) {
     const messages = container.querySelector('#hermes-messages');
     try {
       const resp = await fetch('/api/agent/hermes/chat', {
@@ -100,24 +102,33 @@ const AppHermes = {
       this.history.push({ role: 'assistant', content: mockResponses[Math.floor(Math.random() * mockResponses.length)] });
     }
 
-    messages.innerHTML = this.renderMessages();
+    messages.innerHTML = this._renderMessages();
     messages.scrollTop = messages.scrollHeight;
     this.streaming = false;
     const send = container.querySelector('#hermes-send');
     if (send) { send.disabled = false; send.textContent = 'Send'; }
   },
 
-  async checkHealth(container) {
+  async _checkHealth(container) {
     const status = container.querySelector('#hermes-status');
+    const providerEl = container.querySelector('#hermes-provider');
     if (!status) return;
+
     try {
       const resp = await fetch('/api/agent/hermes/health');
       const data = await resp.json();
       status.textContent = data.status || 'Connected';
       status.className = 'app-status online';
+      if (data.provider) this._agentInfo.provider = data.provider;
+      if (data.model) this._agentInfo.model = data.model;
     } catch {
       status.textContent = 'Offline (mock)';
       status.className = 'app-status offline';
+      this._agentInfo = { provider: '—', model: '—' };
+    }
+
+    if (providerEl) {
+      providerEl.textContent = this._agentInfo.provider + ' / ' + this._agentInfo.model;
     }
   }
 };

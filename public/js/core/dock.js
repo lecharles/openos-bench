@@ -64,7 +64,7 @@ const Dock = {
         const label = item.querySelector('.dock-label');
         if (label) label.style.opacity = t > 0.5 ? '1' : '0';
       } else {
-        item.style.width = '52px';
+        item.style.width = '';
         const icon = item.querySelector('.dock-icon');
         if (icon) icon.style.transform = 'scale(1)';
         const label = item.querySelector('.dock-label');
@@ -77,7 +77,7 @@ const Dock = {
     const items = this._dockItems;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      item.style.width = '52px';
+      item.style.width = '';
       item.style.transition = 'width 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)';
       const icon = item.querySelector('.dock-icon');
       if (icon) { icon.style.transition = 'transform 300ms cubic-bezier(0.17, 0.67, 0.35, 1.17)'; icon.style.transform = 'scale(1)'; }

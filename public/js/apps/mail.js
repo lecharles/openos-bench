@@ -4,7 +4,11 @@ const AppMail = {
 
   async render(container) {
     await this.loadEmails();
-    if (this.emails.length === 0) this.seedEmails();
+    if (this.emails.length === 0) {
+      this.seedEmails();
+      await new Promise(r => setTimeout(r, 50)); // let seed write complete
+      await this.loadEmails();
+    }
 
     container.innerHTML = `
       <div class="app-split">

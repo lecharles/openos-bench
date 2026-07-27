@@ -48,5 +48,15 @@ const Persistence = {
     // Apply accent color
     const accent = this.settings.accent || '#007AFF';
     document.documentElement.style.setProperty('--accent-color', accent);
+
+    // Apply theme
+    const theme = this.settings.theme || 'auto';
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
   }
 };

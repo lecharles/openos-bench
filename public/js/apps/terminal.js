@@ -10,7 +10,7 @@ const AppTerminal = {
       </div>
       <div class="app-terminal-input-row">
         <span class="app-terminal-prompt">$</span>
-        <input type="text" id="terminal-input" class="app-input app-terminal-input" placeholder="Enter command..." autofocus>
+        <input type="text" id="terminal-input" class="app-input app-terminal-input" placeholder="Enter command..." autocomplete="off">
       </div>
     `;
 
@@ -40,10 +40,11 @@ const AppTerminal = {
             const parts = this.cwd.split('/').filter(Boolean);
             parts.pop();
             this.cwd = '/' + parts.join('/');
+            if (this.cwd === '') this.cwd = '/';
           } else if (target.startsWith('/')) {
-            this.cwd = target;
+            this.cwd = target.replace(/\/+/g, '/');
           } else {
-            this.cwd = this.cwd.replace(/\/$/, '') + '/' + target;
+            this.cwd = (this.cwd.replace(/\/+$/, '') + '/' + target).replace(/\/+/g, '/');
           }
           output.innerHTML += `\n<span style="color:#888;">→ ${AppUtils.escapeHtml(this.cwd)}</span>`;
           output.scrollTop = output.scrollHeight;
@@ -59,11 +60,17 @@ const AppTerminal = {
             body: JSON.stringify({ command: cmd, cwd: this.cwd })
           });
           const data = await resp.json();
-          if (data.stdout) output.innerHTML += `\n${AppUtils.escapeHtml(data.stdout)}`;
-          if (data.stderr) output.innerHTML += `\n<span style="color:#ff5f57;">${AppUtils.escapeHtml(data.stderr)}</span>`;
-          if (data.exitCode !== 0) output.innerHTML += `\n<span style="color:#ff5f57;">[exit: ${data.exitCode}]</span>`;
+          if (data.stdout && data.stdout.trim()) {
+            output.innerHTML += '\n' + AppUtils.escapeHtml(data.stdout.trimEnd());
+          }
+          if (data.stderr && data.stderr.trim()) {
+            output.innerHTML += '\n<span style="color:#ff5f57;">' + AppUtils.escapeHtml(data.stderr.trimEnd()) + '</span>';
+          }
+          if (data.exitCode && data.exitCode !== 0) {
+            output.innerHTML += '\n<span style="color:#ff5f57;">[exit: ' + data.exitCode + ']</span>';
+          }
         } catch (e) {
-          output.innerHTML += `\n<span style="color:#ff5f57;">Error: ${AppUtils.escapeHtml(e.message)}</span>`;
+          output.innerHTML += '\n<span style="color:#ff5f57;">Error: ' + AppUtils.escapeHtml(e.message) + '</span>';
         }
 
         output.scrollTop = output.scrollHeight;

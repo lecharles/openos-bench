@@ -4,7 +4,11 @@ const AppContacts = {
 
   async render(container) {
     await this.loadContacts();
-    if (this.contacts.length === 0) this.seedContacts();
+    if (this.contacts.length === 0) {
+      this.seedContacts();
+      await new Promise(r => setTimeout(r, 50));
+      await this.loadContacts();
+    }
 
     container.innerHTML = `
       <div class="app-toolbar">

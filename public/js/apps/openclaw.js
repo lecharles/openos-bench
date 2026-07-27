@@ -3,6 +3,7 @@ const AppOpenClaw = {
   history: [],
   tasks: [],
   streaming: false,
+  _agentInfo: { provider: '—', model: '—' },
 
   render(container) {
     container.innerHTML = `
@@ -10,11 +11,12 @@ const AppOpenClaw = {
         <div class="app-toolbar">
           <span class="app-toolbar-title">🦞 OpenClaw</span>
           <span class="app-spacer"></span>
+          <span id="openclaw-provider" style="font-size:11px;color:var(--content-text-tertiary);margin-right:8px;"></span>
           <span id="openclaw-status" class="app-status offline">Checking...</span>
         </div>
         <div style="display:flex;flex:1;overflow:hidden;">
           <div class="app-column" style="flex:1;">
-            <div class="app-chat" id="openclaw-messages">${this.renderMessages()}</div>
+            <div class="app-chat" id="openclaw-messages">${this._renderMessages()}</div>
             <div class="app-chat-input">
               <div class="app-chat-input-row">
                 <textarea id="openclaw-input" class="app-input" placeholder="Message OpenClaw..." rows="1"></textarea>
@@ -27,7 +29,7 @@ const AppOpenClaw = {
               </div>
             </div>
           </div>
-          <div class="app-sidebar" id="openclaw-sidebar" style="width:200px;border-left:0.5px solid var(--separator);padding:var(--space-3);">
+          <div class="app-sidebar" id="openclaw-sidebar" style="width:200px;border-left:0.5px solid var(--separator);padding:var(--space-3);overflow-y:auto;">
             <h4 style="font-size:var(--text-body);margin-bottom:var(--space-2);">Tasks</h4>
             <div id="openclaw-tasks"></div>
             <h4 style="font-size:var(--text-body);margin-top:var(--space-4);margin-bottom:var(--space-2);">History</h4>
@@ -37,12 +39,12 @@ const AppOpenClaw = {
       </div>
     `;
 
-    this.setupChat(container);
-    this.checkHealth(container);
-    this.renderTasks(container);
+    this._setupChat(container);
+    this._checkHealth(container);
+    this._renderTasks(container);
   },
 
-  renderMessages() {
+  _renderMessages() {
     if (this.history.length === 0) {
       return '<div class="app-empty">Start a conversation with OpenClaw</div>';
     }
@@ -52,7 +54,7 @@ const AppOpenClaw = {
     }).join('');
   },
 
-  renderTasks(container) {
+  _renderTasks(container) {
     const el = container.querySelector('#openclaw-tasks');
     if (!el) return;
     if (this.tasks.length === 0) {
@@ -67,7 +69,7 @@ const AppOpenClaw = {
     `).join('');
   },
 
-  setupChat(container) {
+  _setupChat(container) {
     const input = container.querySelector('#openclaw-input');
     const send = container.querySelector('#openclaw-send');
     const messages = container.querySelector('#openclaw-messages');
@@ -78,14 +80,14 @@ const AppOpenClaw = {
       input.value = '';
 
       this.history.push({ role: 'user', content: text });
-      messages.innerHTML = this.renderMessages();
+      messages.innerHTML = this._renderMessages();
       messages.scrollTop = messages.scrollHeight;
 
       this.streaming = true;
       send.disabled = true;
       send.textContent = '...';
 
-      this.sendToAgent(text, container);
+      this._sendToAgent(text, container);
     };
 
     send.addEventListener('click', doSend);
@@ -95,11 +97,11 @@ const AppOpenClaw = {
 
     container.querySelector('#openclaw-clear').addEventListener('click', () => {
       this.history = [];
-      messages.innerHTML = this.renderMessages();
+      messages.innerHTML = this._renderMessages();
     });
 
     container.querySelector('#openclaw-reconnect').addEventListener('click', () => {
-      this.checkHealth(container);
+      this._checkHealth(container);
     });
 
     container.querySelector('#openclaw-logs').addEventListener('click', async () => {
@@ -119,7 +121,7 @@ const AppOpenClaw = {
     });
   },
 
-  async sendToAgent(text, container) {
+  async _sendToAgent(text, container) {
     const messages = container.querySelector('#openclaw-messages');
 
     try {
@@ -144,24 +146,33 @@ const AppOpenClaw = {
       this.history.push({ role: 'assistant', content: mockResponses[Math.floor(Math.random() * mockResponses.length)] });
     }
 
-    messages.innerHTML = this.renderMessages();
+    messages.innerHTML = this._renderMessages();
     messages.scrollTop = messages.scrollHeight;
     this.streaming = false;
     const send = container.querySelector('#openclaw-send');
     if (send) { send.disabled = false; send.textContent = 'Send'; }
   },
 
-  async checkHealth(container) {
+  async _checkHealth(container) {
     const status = container.querySelector('#openclaw-status');
+    const providerEl = container.querySelector('#openclaw-provider');
     if (!status) return;
+
     try {
       const resp = await fetch('/api/agent/openclaw/health');
       const data = await resp.json();
       status.textContent = data.status || 'Connected';
       status.className = 'app-status online';
+      if (data.provider) this._agentInfo.provider = data.provider;
+      if (data.model) this._agentInfo.model = data.model;
     } catch {
       status.textContent = 'Offline (mock)';
       status.className = 'app-status offline';
+      this._agentInfo = { provider: '—', model: '—' };
+    }
+
+    if (providerEl) {
+      providerEl.textContent = this._agentInfo.provider + ' / ' + this._agentInfo.model;
     }
   }
 };
