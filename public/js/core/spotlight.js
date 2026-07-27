@@ -14,7 +14,13 @@ const Spotlight = {
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === ' ') {
         e.preventDefault();
-        this.show(overlay, input);
+        // Toggle: close if already open
+        if (!overlay.classList.contains('hidden')) {
+          overlay.classList.add('hidden');
+          this.selectedIndex = -1;
+        } else {
+          this.show(overlay, input);
+        }
       }
       if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
         overlay.classList.add('hidden');

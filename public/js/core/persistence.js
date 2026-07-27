@@ -1,8 +1,12 @@
 // Persistence - settings and state management
 const Persistence = {
   settings: null,
+  _themeMq: null,
 
   async init() {
+    // Track OS theme for "auto" mode
+    this._themeMq = window.matchMedia('(prefers-color-scheme: dark)');
+    this._themeMq.addEventListener('change', () => this.applySettings());
     await this.loadSettings();
     // Listen for realtime updates
     if (window.socket) {
@@ -15,6 +19,7 @@ const Persistence = {
       window.socket.on('calendar:updated', () => {});
       window.socket.on('contacts:updated', () => {});
       window.socket.on('mail:updated', () => {});
+      window.socket.on('messages:updated', () => {});
     }
   },
 
@@ -45,18 +50,18 @@ const Persistence = {
 
   applySettings() {
     if (!this.settings) return;
-    // Apply accent color
+    // Apply accent color — --color-blue is the token all blue UI derives from
     const accent = this.settings.accent || '#007AFF';
     document.documentElement.style.setProperty('--accent-color', accent);
+    document.documentElement.style.setProperty('--color-blue', accent);
 
-    // Apply theme
-    const theme = this.settings.theme || 'auto';
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
+    // Apply theme ("auto" follows the OS via prefers-color-scheme)
+    let theme = this.settings.theme || 'auto';
+    if (theme === 'auto') {
+      theme = (this._themeMq && this._themeMq.matches) ? 'dark' : 'light';
     }
+    document.documentElement.setAttribute('data-theme', theme);
+    // Cache for the pre-paint boot script in index.html (avoids theme flash)
+    try { localStorage.setItem('kbd-theme', theme); } catch {}
   }
 };

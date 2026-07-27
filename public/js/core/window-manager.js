@@ -17,15 +17,14 @@ const WindowManager = {
   },
 
   open(appId, title, opts = {}) {
-    // If window exists and is minimized, restore
-    const existingKey = `${appId}-${opts.instance || 0}`;
-    if (this.windows[existingKey]) {
-      const win = this.windows[existingKey];
-      if (win.el.classList.contains('minimized')) {
-        win.el.classList.remove('minimized');
+    // Single-window-per-app by default: focus/restore an existing window
+    if (!opts.forceNew) {
+      const existing = Object.values(this.windows).find(w => w.appId === appId);
+      if (existing) {
+        existing.el.classList.remove('minimized');
+        this.focus(existing);
+        return existing;
       }
-      this.focus(win);
-      return win;
     }
 
     const win = this.createWindow(appId, title, opts);
@@ -115,12 +114,13 @@ const WindowManager = {
       sx = parseInt(el.style.left) || el.offsetLeft;
       sy = parseInt(el.style.top) || el.offsetTop;
     });
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', el._winObj._dragMove = (e) => {
       if (!dragging) return;
-      el.style.left = (sx + e.clientX - ox) + 'px';
+      const minLeft = -el.offsetWidth + 80; // keep a grab strip visible
+      el.style.left = Math.max(minLeft, sx + e.clientX - ox) + 'px';
       el.style.top = Math.max(0, sy + e.clientY - oy) + 'px';
     });
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', el._winObj._dragUp = () => {
       if (dragging) {
         dragging = false;
         el.classList.remove('dragging');
@@ -218,6 +218,9 @@ const WindowManager = {
     if (winObj._cleanup && typeof winObj._cleanup === 'function') {
       try { winObj._cleanup(); } catch {}
     }
+    // Remove document-level drag listeners for this window
+    if (winObj._dragMove) document.removeEventListener('mousemove', winObj._dragMove);
+    if (winObj._dragUp) document.removeEventListener('mouseup', winObj._dragUp);
 
     // Animate out
     winObj.el.style.transition = 'opacity 150ms cubic-bezier(0.2,0,0,1), transform 150ms cubic-bezier(0.2,0,0,1)';
@@ -240,33 +243,38 @@ const WindowManager = {
   },
 
   renderApp(winObj, appId, opts) {
-    // Use dynamic app lookup via AppRegistry
-    const appMeta = AppRegistry.get(appId);
-    const renderFn = window['App' + appId.charAt(0).toUpperCase() + appId.slice(1)];
+    // Apps expose themselves as window.App<Name>; a few have irregular casing
+    const nameMap = { textedit: 'TextEdit', openclaw: 'OpenClaw', agentcontrol: 'AgentControl' };
+    const globalName = 'App' + (nameMap[appId] || appId.charAt(0).toUpperCase() + appId.slice(1));
+    const renderFn = window[globalName];
 
     if (renderFn && typeof renderFn.render === 'function') {
       setTimeout(() => renderFn.render(winObj.content, opts), 50);
     } else {
-      winObj.content.innerHTML = `<div class="app-empty">"${appMeta.name}" is loading...</div>`;
+      const appMeta = AppRegistry.get(appId);
+      winObj.content.innerHTML = `<div class="app-empty">"${appMeta.name}" failed to load.</div>`;
+      console.error(`App global ${globalName} not found for app "${appId}"`);
     }
   },
 
   saveWindows() {
-    const data = Object.values(this.windows).map(w => ({
-      key: w.key,
-      appId: w.appId,
-      title: w.title,
-      x: parseInt(w.el.style.left) || w.el.offsetLeft,
-      y: parseInt(w.el.style.top) || w.el.offsetTop,
-      width: parseInt(w.el.style.width) || w.el.offsetWidth,
-      height: parseInt(w.el.style.height) || w.el.offsetHeight,
-      maximized: w.maximized,
-      minimized: w.el.classList.contains('minimized'),
-      opts: w.opts,
-    }));
-    if (data.length > 0) {
-      fetch('/api/windows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    }
+    const data = Object.values(this.windows).map(w => {
+      // Never persist transient payloads (e.g. TextEdit file content) — only open-options like path
+      const { content, ...safeOpts } = w.opts || {};
+      return {
+        key: w.key,
+        appId: w.appId,
+        title: w.title,
+        x: parseInt(w.el.style.left) || w.el.offsetLeft,
+        y: parseInt(w.el.style.top) || w.el.offsetTop,
+        width: parseInt(w.el.style.width) || w.el.offsetWidth,
+        height: parseInt(w.el.style.height) || w.el.offsetHeight,
+        maximized: w.maximized,
+        minimized: w.el.classList.contains('minimized'),
+        opts: safeOpts,
+      };
+    });
+    fetch('/api/windows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
   },
 
   async loadSaved() {
@@ -275,14 +283,21 @@ const WindowManager = {
       const windows = await resp.json();
       if (!Array.isArray(windows)) return;
       windows.forEach(w => {
-        if (!w.minimized) {
-          const win = this.open(w.appId, w.title, {
-            x: w.x, y: w.y, width: w.width, height: w.height, instance: w.opts?.instance,
-          });
-          if (win && w.maximized) {
-            win.el.classList.add('maximized');
-            win.maximized = true;
-          }
+        // Clamp restored geometry into the current viewport
+        const x = Math.min(Math.max(0, w.x || 0), Math.max(0, window.innerWidth - 120));
+        const y = Math.min(Math.max(0, w.y || 0), Math.max(0, window.innerHeight - 120));
+        const width = Math.min(w.width || 720, window.innerWidth);
+        const height = Math.min(w.height || 500, window.innerHeight);
+        const dup = Object.values(this.windows).some(ew => ew.appId === w.appId);
+        // Minimized windows restore visible (no minimized-window dock in this build)
+        const win = this.open(w.appId, w.title, {
+          ...(w.opts || {}),
+          x, y, width, height,
+          forceNew: dup,
+        });
+        if (win && w.maximized) {
+          win.el.classList.add('maximized');
+          win.maximized = true;
         }
       });
     } catch {}

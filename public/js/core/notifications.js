@@ -31,8 +31,8 @@ const Notifications = {
     }
     el.innerHTML = this.list.map(n =>
       `<div class="notification-item">
-        <strong>${n.title}</strong>
-        <div>${n.message}</div>
+        <strong>${AppUtils.escapeHtml(n.title)}</strong>
+        <div>${AppUtils.escapeHtml(n.message)}</div>
         <div class="notif-time">${n.time}</div>
       </div>`
     ).join('');

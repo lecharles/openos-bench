@@ -71,6 +71,9 @@ app.post('/api/wallpaper', express.raw({ type: 'image/*', limit: '5mb' }), async
     const ext = req.headers['content-type']?.includes('png') ? 'png' : 'jpg';
     const fp = path.join(DATA_DIR, 'wallpaper.' + ext);
     await fs.writeFile(fp, req.body);
+    // Remove the other format so restore never picks a stale image
+    const other = path.join(DATA_DIR, 'wallpaper.' + (ext === 'png' ? 'jpg' : 'png'));
+    await fs.unlink(other).catch(() => {});
     res.json({ ok: true, path: '/data/wallpaper.' + ext });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -91,6 +94,7 @@ crudRoutes(app, 'reminders.json', 'reminders:updated');
 crudRoutes(app, 'calendar.json', 'calendar:updated');
 crudRoutes(app, 'contacts.json', 'contacts:updated');
 crudRoutes(app, 'mail.json', 'mail:updated');
+crudRoutes(app, 'messages.json', 'messages:updated');
 
 // Agent proxy
 agentRoutes(app);

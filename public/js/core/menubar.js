@@ -1,10 +1,17 @@
-// Menu Bar - clock and interactions
+// Menu Bar - clock, Apple menu, application menus
 const MenuBar = {
+  _openDropdown: null,
+
   init() {
     this.updateClock();
-    setInterval(() => this.updateClock(), 30000);
+    setInterval(() => this.updateClock(), 1000);
     this.setupMenus();
     this.setupAppleMenu();
+    // macOS: clicking the clock opens Notification Center
+    document.getElementById('menubar-clock').addEventListener('click', (e) => {
+      e.stopPropagation();
+      Notifications.toggle();
+    });
   },
 
   updateClock() {
@@ -17,15 +24,131 @@ const MenuBar = {
       `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()}  ${h}:${m}`;
   },
 
+  // Menu definitions; items: [label, action] or '-' for separator
+  _menus: {
+    finder: [
+      ['About Finder', () => Notifications.add('Finder', 'KiMi Desktop Finder 1.0')],
+      '-',
+      ['Open Finder', () => WindowManager.open('finder', 'Finder')],
+    ],
+    file: [
+      ['New Finder Window', () => WindowManager.open('finder', 'Finder')],
+      ['Close Window', () => {
+        const w = WindowManager.focusedWindow;
+        if (w) WindowManager.close(w);
+      }],
+    ],
+    edit: [
+      ['Cut', () => document.execCommand('cut')],
+      ['Copy', () => document.execCommand('copy')],
+      ['Paste', () => document.execCommand('paste')],
+      ['Select All', () => document.execCommand('selectAll')],
+    ],
+    view: [
+      ['Toggle Dark Mode', async () => {
+        const s = await Persistence.getSettings();
+        const cur = document.documentElement.getAttribute('data-theme');
+        await Persistence.saveSettings({ theme: cur === 'dark' ? 'light' : 'dark' });
+      }],
+      '-',
+      ['Enter Full Screen', () => document.documentElement.requestFullscreen?.()],
+      ['Reload Desktop', () => location.reload()],
+    ],
+    go: [
+      ['Home', () => WindowManager.open('finder', 'Finder', { dir: '/root' })],
+      ['Projects', () => WindowManager.open('finder', 'Finder', { dir: '/root/kimi-browser-desktop' })],
+      ['Temporary', () => WindowManager.open('finder', 'Finder', { dir: '/tmp' })],
+    ],
+    window: [
+      ['Minimize', () => {
+        const w = WindowManager.focusedWindow;
+        if (w) WindowManager.minimize(w);
+      }],
+      ['Zoom', () => {
+        const w = WindowManager.focusedWindow;
+        if (w) WindowManager.toggleMaximize(w);
+      }],
+      '-',
+      // Open windows are appended dynamically
+    ],
+    help: [
+      ['About KiMi Desktop', () => Notifications.add('KiMi Desktop', 'macOS-inspired browser desktop — KiMi 3 build')],
+    ],
+  },
+
   setupMenus() {
     document.querySelectorAll('.menu-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const menu = item.dataset.menu;
-        if (menu === 'finder' && !WindowManager.windows['finder-0']) {
-          WindowManager.open('finder', 'Finder');
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const name = item.dataset.menu;
+        if (this._openDropdown && this._openDropdown.dataset.menu === name) {
+          this._closeDropdown();
+          return;
         }
+        this._showDropdown(name, item);
       });
     });
+  },
+
+  _showDropdown(name, anchor) {
+    this._closeDropdown();
+    const items = [...(this._menus[name] || [])];
+    if (name === 'window') {
+      Object.values(WindowManager.windows).forEach(w => {
+        items.push([w.title, () => {
+          w.el.classList.remove('minimized');
+          WindowManager.focus(w);
+        }]);
+      });
+    }
+    if (items.length === 0) return;
+
+    const menu = document.createElement('div');
+    menu.className = 'context-menu apple-dropdown';
+    menu.dataset.menu = name;
+    menu.style.position = 'fixed';
+    const rect = anchor.getBoundingClientRect();
+    menu.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+    menu.style.top = '28px';
+    menu.style.zIndex = '3001';
+    menu.style.transformOrigin = 'top left';
+    menu.innerHTML = items.map(it =>
+      it === '-' ? '<div class="context-sep"></div>'
+                 : `<div class="context-item">${AppUtils.escapeHtml(it[0])}</div>`
+    ).join('');
+    document.body.appendChild(menu);
+
+    requestAnimationFrame(() => {
+      menu.style.opacity = '1';
+      menu.style.transform = 'scale(1)';
+    });
+
+    menu.querySelectorAll('.context-item').forEach((el, i) => {
+      const actionable = items.filter(it => it !== '-');
+      el.addEventListener('click', () => {
+        const item = actionable[i];
+        if (item && item[1]) item[1]();
+        this._closeDropdown();
+      });
+    });
+
+    this._openDropdown = menu;
+    setTimeout(() => {
+      document.addEventListener('click', this._dropdownDismiss = (ev) => {
+        if (this._openDropdown && !this._openDropdown.contains(ev.target)) this._closeDropdown();
+      });
+    }, 10);
+  },
+
+  _closeDropdown() {
+    if (this._openDropdown) {
+      this._openDropdown.remove();
+      this._openDropdown = null;
+    }
+    if (this._dropdownDismiss) {
+      document.removeEventListener('click', this._dropdownDismiss);
+      this._dropdownDismiss = null;
+    }
   },
 
   setupAppleMenu() {
@@ -49,9 +172,6 @@ const MenuBar = {
         <div class="context-item" data-action="about">About This Mac</div>
         <div class="context-sep"></div>
         <div class="context-item" data-action="settings">System Settings…</div>
-        <div class="context-item" data-action="appstore">App Store…</div>
-        <div class="context-sep"></div>
-        <div class="context-item" data-action="recent">Recent Items</div>
         <div class="context-sep"></div>
         <div class="context-item" data-action="forcequit">Force Quit…</div>
         <div class="context-sep"></div>
