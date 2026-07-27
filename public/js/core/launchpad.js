@@ -1,13 +1,27 @@
-// Launchpad - app grid overlay
+// Launchpad - app grid overlay with keyboard support
 const Launchpad = {
   init() {
-    // Trigger via F4 or the Launchpad icon in dock (we add it implicitly)
+    // Trigger via F4 or Escape to dismiss
     document.addEventListener('keydown', (e) => {
       if (e.key === 'F4') {
         e.preventDefault();
         this.toggle();
       }
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('launchpad-overlay');
+        if (!overlay.classList.contains('hidden')) {
+          overlay.classList.add('hidden');
+        }
+      }
     });
+
+    const overlay = document.getElementById('launchpad-overlay');
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.add('hidden');
+      }
+    });
+
     this.buildGrid();
   },
 

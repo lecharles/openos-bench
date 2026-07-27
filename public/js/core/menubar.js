@@ -2,7 +2,7 @@
 const MenuBar = {
   init() {
     this.updateClock();
-    setInterval(() => this.updateClock(), 10000);
+    setInterval(() => this.updateClock(), 30000);
     this.setupMenus();
     this.setupAppleMenu();
   },
@@ -29,41 +29,66 @@ const MenuBar = {
   },
 
   setupAppleMenu() {
-    document.getElementById('apple-menu-btn').addEventListener('click', (e) => {
+    const btn = document.getElementById('apple-menu-btn');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Remove any existing apple menu
+      const existing = document.querySelector('.apple-dropdown');
+      if (existing) { existing.remove(); return; }
+
       const menu = document.createElement('div');
-      menu.className = 'context-menu';
+      menu.className = 'context-menu apple-dropdown';
       menu.style.position = 'fixed';
-      menu.style.left = '4px';
-      menu.style.top = '30px';
-      menu.style.zIndex = '3000';
+      menu.style.left = '6px';
+      menu.style.top = '28px';
+      menu.style.zIndex = '3001';
+      menu.style.transformOrigin = 'top left';
+      // Override hidden — show immediately
+      menu.classList.remove('hidden');
       menu.innerHTML = `
-        <div class="context-item">About This Mac</div>
+        <div class="context-item" data-action="about">About This Mac</div>
         <div class="context-sep"></div>
-        <div class="context-item">System Settings…</div>
-        <div class="context-item">App Store…</div>
+        <div class="context-item" data-action="settings">System Settings…</div>
+        <div class="context-item" data-action="appstore">App Store…</div>
         <div class="context-sep"></div>
-        <div class="context-item">Recent Items</div>
+        <div class="context-item" data-action="recent">Recent Items</div>
         <div class="context-sep"></div>
-        <div class="context-item">Force Quit…</div>
+        <div class="context-item" data-action="forcequit">Force Quit…</div>
         <div class="context-sep"></div>
-        <div class="context-item">Sleep</div>
-        <div class="context-item">Restart…</div>
-        <div class="context-item">Shut Down…</div>
+        <div class="context-item" data-action="sleep">Sleep</div>
+        <div class="context-item" data-action="restart">Restart…</div>
+        <div class="context-item" data-action="shutdown">Shut Down…</div>
         <div class="context-sep"></div>
-        <div class="context-item">Lock Screen</div>
+        <div class="context-item" data-action="lock">Lock Screen</div>
       `;
       document.body.appendChild(menu);
 
+      // Animate in
+      requestAnimationFrame(() => {
+        menu.style.opacity = '1';
+        menu.style.transform = 'scale(1)';
+      });
+
       menu.querySelectorAll('.context-item').forEach(item => {
         item.addEventListener('click', () => {
-          const text = item.textContent;
-          if (text.includes('System Settings')) WindowManager.open('settings', 'System Settings');
-          if (text.includes('Force Quit')) WindowManager.open('activity', 'Activity Monitor');
+          const action = item.dataset.action;
+          if (action === 'settings') WindowManager.open('settings', 'System Settings');
+          if (action === 'forcequit') WindowManager.open('activity', 'Activity Monitor');
+          if (action === 'about') Notifications.add('About This Mac', 'KiMi Desktop 1.0 — macOS-inspired browser desktop');
+          if (action === 'lock') Notifications.add('Lock Screen', 'Screen locked');
+          if (action === 'sleep') Notifications.add('Sleep', 'System sleeping…');
+          if (action === 'restart') Notifications.add('Restart', 'System restarting…');
+          if (action === 'shutdown') Notifications.add('Shut Down', 'System shutting down…');
           menu.remove();
         });
       });
 
-      const remove = () => { menu.remove(); document.removeEventListener('click', remove); };
+      const remove = (ev) => {
+        if (!menu.contains(ev.target)) {
+          menu.remove();
+          document.removeEventListener('click', remove);
+        }
+      };
       setTimeout(() => document.addEventListener('click', remove), 10);
     });
   }

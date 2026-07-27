@@ -41,9 +41,9 @@ const WindowManager = {
   createWindow(appId, title, opts) {
     const el = document.createElement('div');
     el.className = 'window';
-    const w = opts.width || 700;
-    const h = opts.height || 480;
-    const l = opts.x || (100 + Object.keys(this.windows).length * 30);
+    const w = opts.width || 720;
+    const h = opts.height || 500;
+    const l = opts.x || (120 + Object.keys(this.windows).length * 32);
     const t = opts.y || (60 + Object.keys(this.windows).length * 30);
     el.style.width = w + 'px';
     el.style.height = h + 'px';
@@ -101,12 +101,13 @@ const WindowManager = {
     let dragging = false, ox, oy, sx, sy;
     titlebar.addEventListener('mousedown', (e) => {
       if (e.target.closest('.window-buttons')) return;
+      if (el.classList.contains('maximized')) return;
       dragging = true;
       el.classList.add('dragging');
       ox = e.clientX;
       oy = e.clientY;
-      sx = parseInt(el.style.left);
-      sy = parseInt(el.style.top);
+      sx = parseInt(el.style.left) || el.offsetLeft;
+      sy = parseInt(el.style.top) || el.offsetTop;
     });
     document.addEventListener('mousemove', (e) => {
       if (!dragging) return;
@@ -131,18 +132,19 @@ const WindowManager = {
       handle.addEventListener('mousedown', (e) => {
         e.stopPropagation();
         const dir = [...handle.classList].find(c => ['nw','ne','sw','se','n','s','e','w'].includes(c));
-        if (!dir) return;
+        if (!dir || el.classList.contains('maximized')) return;
         el.classList.add('resizing');
         const startX = e.clientX, startY = e.clientY;
         const startW = el.offsetWidth, startH = el.offsetHeight;
-        const startL = parseInt(el.style.left), startT = parseInt(el.style.top);
+        const startL = parseInt(el.style.left) || el.offsetLeft;
+        const startT = parseInt(el.style.top) || el.offsetTop;
 
         const onMove = (ev) => {
           const dx = ev.clientX - startX, dy = ev.clientY - startY;
-          if (dir.includes('e')) el.style.width = Math.max(320, startW + dx) + 'px';
-          if (dir.includes('w')) { el.style.width = Math.max(320, startW - dx) + 'px'; el.style.left = (startL + dx) + 'px'; }
-          if (dir.includes('s')) el.style.height = Math.max(200, startH + dy) + 'px';
-          if (dir.includes('n')) { el.style.height = Math.max(200, startH - dy) + 'px'; el.style.top = (startT + dy) + 'px'; }
+          if (dir.includes('e')) el.style.width = Math.max(340, startW + dx) + 'px';
+          if (dir.includes('w')) { el.style.width = Math.max(340, startW - dx) + 'px'; el.style.left = (startL + dx) + 'px'; }
+          if (dir.includes('s')) el.style.height = Math.max(220, startH + dy) + 'px';
+          if (dir.includes('n')) { el.style.height = Math.max(220, startH - dy) + 'px'; el.style.top = (startT + dy) + 'px'; }
         };
         const onUp = () => {
           document.removeEventListener('mousemove', onMove);
@@ -174,10 +176,11 @@ const WindowManager = {
 
   focus(winObj) {
     if (this.focusedWindow === winObj) return;
-    if (this.focusedWindow) {
+    if (this.focusedWindow && this.focusedWindow.el.parentNode) {
       this.focusedWindow.el.classList.remove('focused');
     }
     this.focusedWindow = winObj;
+    winObj.el.classList.remove('minimized');
     winObj.el.classList.add('focused');
     winObj.el.style.zIndex = ++this.zIndex;
     // Update active app menu
@@ -197,12 +200,20 @@ const WindowManager = {
 
   minimize(winObj) {
     winObj.el.classList.add('minimized');
-    if (this.focusedWindow === winObj) this.focusedWindow = null;
+    if (this.focusedWindow === winObj) {
+      this.focusedWindow = null;
+      document.getElementById('active-app-menu').textContent = '';
+    }
     this.saveWindows();
   },
 
   close(winObj) {
-    winObj.el.remove();
+    // Animate out
+    winObj.el.style.transition = 'opacity 150ms cubic-bezier(0.2,0,0,1), transform 150ms cubic-bezier(0.2,0,0,1)';
+    winObj.el.style.opacity = '0';
+    winObj.el.style.transform = 'scale(0.92)';
+    winObj.el.style.pointerEvents = 'none';
+
     const key = winObj.key;
     delete this.windows[key];
     Dock.setRunning(winObj.appId, Object.values(this.windows).some(w => w.appId === winObj.appId));
@@ -210,6 +221,10 @@ const WindowManager = {
       this.focusedWindow = null;
       document.getElementById('active-app-menu').textContent = '';
     }
+
+    setTimeout(() => {
+      if (winObj.el.parentNode) winObj.el.remove();
+    }, 160);
     this.saveWindows();
   },
 
@@ -252,21 +267,24 @@ const WindowManager = {
       key: w.key,
       appId: w.appId,
       title: w.title,
-      x: parseInt(w.el.style.left),
-      y: parseInt(w.el.style.top),
-      width: parseInt(w.el.style.width),
-      height: parseInt(w.el.style.height),
+      x: parseInt(w.el.style.left) || w.el.offsetLeft,
+      y: parseInt(w.el.style.top) || w.el.offsetTop,
+      width: parseInt(w.el.style.width) || w.el.offsetWidth,
+      height: parseInt(w.el.style.height) || w.el.offsetHeight,
       maximized: w.maximized,
       minimized: w.el.classList.contains('minimized'),
       opts: w.opts,
     }));
-    fetch('/api/windows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    if (data.length > 0) {
+      fetch('/api/windows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    }
   },
 
   async loadSaved() {
     try {
       const resp = await fetch('/api/windows');
       const windows = await resp.json();
+      if (!Array.isArray(windows)) return;
       windows.forEach(w => {
         if (!w.minimized) {
           const win = this.open(w.appId, w.title, {
