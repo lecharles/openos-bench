@@ -1,8 +1,8 @@
 # KiMi Browser Desktop — Status
 
-## Current Status: **KiMi 3 Audit & Repair Complete — Verified Working**
+## Current Status: **All Phases 1–6 Complete — Verified Working**
 
-**Last Updated:** 2026-07-27 UTC
+**Last Updated:** 2026-07-27 UTC (usage audit + supervisor files committed)
 
 ## Model Correction (2026-07-27)
 
@@ -89,11 +89,6 @@ node server.js
 8. **Headless Chromium may not paint `backdrop-filter`** — blur/vibrancy is present in CSS with fallbacks but was not visually verifiable in the headless environment.
 9. **Desktop-only design** (~1024px+); a basic `@media` rule covers smaller widths but mobile is not a target.
 
-## Commits (local only, not pushed)
-
-- `11c9a13` — KiMi 3 audit: core shell + server fixes
-- `c713df2` — KiMi 3: repair all 21 apps, agent streaming, Phase 4/5/6 polish
-
 ## Acceptance Review (for OpenCode)
 
 1. `cd /root/kimi-browser-desktop && node server.js`
@@ -103,6 +98,33 @@ node server.js
 5. Persistence: open/move windows → reload → restored; close all → reload → nothing resurrects; theme light/dark/auto.
 6. Agents: Hermes/OpenClaw show "Offline (mock)" (not "Connected"); Agent Control health checks show Unreachable; mock chat replies work.
 7. Automated: `cd /tmp/kbd-e2e && node smoke.js` (requires the puppeteer-core harness in /tmp; reinstall with `npm i puppeteer-core` if wiped).
+
+## Usage Audit (2026-07-27)
+
+| Model | Provider | Sessions | Turns | Output Tokens | Cost (est.) |
+|-------|----------|----------|-------|---------------|-------------|
+| KiMi K3 | OpenCode Go Zen | 2 | 279 | 183,945 | ~$2-3 |
+| DeepSeek V4 Pro | OpenCode Go Zen | 5 | 225 | 158,055 | ~$1-2 |
+| GPT-5.5 | OpenAI direct | 1 | 115 | unlogged | ~$1-2 |
+| **Total** | | **8** | **619** | **342,000** | **~$5-7** |
+
+- All KiMi Code implementation traffic routed through OpenCode Go Zen (`sk-265Z...`).
+- GPT-5.5 was used by the OpenCode orchestrator session (project setup, supervision) — not by KiMi Code.
+- Input tokens not recorded in KiMi Code logs; cost estimates assume ~10:1 input:output ratio.
+- Logs: `/root/kimi-browser-desktop/kimi-run.log`, `kimi3-run.log`, `/root/.kimi-code/sessions/.../logs/kimi-code.log`, `/root/.local/share/opencode/log/`
+
+## Commits (local only, not pushed)
+
+- `5d6c040` — KiMi 3: add model correction prompt, kimi3 worker script, and supervisor phase docs
+- `ba8d719` — STATUS.md: KiMi 3 model correction, audit findings, verified test results, acceptance review guide
+- `c713df2` — KiMi 3: repair all 21 apps, agent apps streaming, and Phase 4/5/6 polish
+- `11c9a13` — KiMi 3 audit: fix core shell + server (app dispatch contract, window keys, persistence, menubar, control center, trash backend, fs hardening)
+- `8d240e6` — Phase 6: QA & Product Readiness
+- `68dcfc9` — Phase 5 — Performance & Engineering Quality
+- `0267411` — Phase 4: Apple HIG Design Pass — complete visual refinement
+- `4661bae` — Update STATUS.md with verified build info
+- `daccb11` — Fix: create winObj before setup functions in window manager
+- `689ca91` — Initial implementation: macOS-inspired browser desktop
 
 ## History
 
