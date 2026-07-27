@@ -1,6 +1,72 @@
 # KiMi Browser Desktop — Status
 
-## Current Status: **All Phases 1–6 Complete — Verified Working**
+## Current Status: **Final Polish Pass Complete (KiMi 3) — Verified Working**
+
+**Last Updated:** 2026-07-27 UTC (final polish: Finder, wallpaper, windows, dock, menus)
+
+## Final Polish Pass (2026-07-27, KiMi 3)
+
+Goal: make the desktop feel as close to modern macOS as possible. No redesign, no new apps. All changes verified with the headless E2E suite (21/21 apps render, 15/15 probes pass, persistence intact).
+
+### Finder — full macOS-grade rewrite (`public/js/apps/finder.js`)
+
+- **Four views** with a segmented toolbar switcher and shortcuts: Icon (⌘1), List (⌘2), Column (⌘3), Gallery (⌘4).
+- **Icon View**: SF-style SVG icons (two-tone folder, per-kind document glyphs), live image thumbnails via new `/api/fs/raw`, icon-size slider in the status bar, blue-pill label selection, ⌘-click multi-select.
+- **List View**: sortable Name / Date Modified / Size / Kind columns (click header to sort/reverse), full-row blue selection.
+- **Column View**: classic hierarchical browsing — clicking a folder appends a column, per-column drag-to-resize grips (140–420px), selected-item highlight with disclosure chevrons, rightmost metadata/preview column for files, auto-scrolls right.
+- **Gallery View**: large animated preview (real images or big icons), bottom thumbnail strip with blue selection ring, right metadata panel (kind/size/modified/path), ‹ › buttons and ←/→ arrow-key navigation, "N of M" counter.
+- **Sidebar**: collapsible Favorites (AirDrop, Recents, Applications, Desktop, Documents, Downloads, Pictures), iCloud (visual), Locations (Macintosh HD → /root, KiMi Projects, Temporary), Tags with colored dots. Recents is a real virtual view (most recently modified files across the standard folders).
+- **Path bar** (clickable breadcrumbs, toggleable via View ▸ Show / Hide Path Bar) and **status bar** ("N items, XX GB available" from real `statfs`).
+- **Interactions**: inline rename with Enter (macOS behavior, real backend `POST /api/fs/rename`), ⌘↑ parent, ⌘↓/⌘O open, ⌘⌫ Move to Trash, right-click context menu (Open / Rename / Get Info / Move to Trash), Get Info floating card, toolbar search filter, smooth fade transitions between folders, navigated location persisted per window.
+- Standard macOS folders created under `/root` (Desktop, Documents, Downloads, Pictures, Applications) so sidebar favorites navigate to real places.
+
+### Server (`routes/fs.js`)
+
+- `/api/fs` entries now include `mtime`; response includes `free` disk bytes (`fs.statfs`).
+- New `POST /api/fs/rename` (name-validated, whitelist+denylist enforced).
+- New `GET /api/fs/raw` (safe raw bytes with MIME for image thumbnails/previews; 20MB cap; `/etc/shadow` probe → 403).
+
+### Desktop wallpaper
+
+- Default wallpaper is now a real high-resolution Unsplash landscape (mountain lake at dusk, 2880×1920, royalty-free), downloaded to `data/wallpaper.jpg` so it loads offline-safe through the existing wallpaper pipeline. No gradient placeholder.
+
+### Window system
+
+- Deeper multi-layer macOS shadows with a clear focused/unfocused elevation difference (smooth cross-fade on focus change).
+- Open animation: 200ms scale+fade. Close: 150ms scale+fade (unchanged).
+- **Minimize animates into the dock icon** (genie-style translate+scale to the icon's live position, 300ms) with animated restore.
+- Maximize/restore now animates geometry smoothly (250ms); drag/resize still disable transitions to avoid jitter.
+- Resize handles moved inside the rounded frame (they were clipped by `overflow: hidden`), corner handles sized to not overlap traffic lights; correct cursors on all 8 handles.
+
+### Dock
+
+- Magnification rewritten: cosine-falloff growth (up to ~1.6×) tracking the cursor with rAF throttling, spring settle on mouse-leave, icons grow from their bottom edge.
+- **Launch bounce**: icon hops when an app launches (also fired on restore).
+- **Tooltips**: macOS-style dark blurred pill above the dock with the app name (replaces the tiny in-dock label).
+- Running-indicator dots and glass dock background retained.
+
+### Menus & misc
+
+- Context menus (desktop, menu-bar dropdowns, Finder) restyled to macOS spec: 5px inner padding, rounded hover items, inset separators, 60ms hover response.
+- Menu bar View menu gained "Show / Hide Path Bar" (dispatches to Finder).
+- Preview app now renders actual images (via `/api/fs/raw`) instead of a placeholder.
+
+### Verification (this pass)
+
+```
+smoke.js:    21/21 apps PASS, 15/15 interaction probes PASS
+             (only expected console errors: agent 502s, terminal-blocked 400)
+persist.js:  window position restored exactly (300px/150px), theme restored,
+             close-all persists empty windows.json
+Finder DOM audit: toolbar/sidebar/content/pathbar/statusbar geometry verified,
+             column navigation, gallery arrow nav, inline rename round-trip
+             (file actually renamed on disk), no page errors
+Window/dock audit: minimize animates to dock icon rect, restore clean,
+             bounce class fires, tooltip positioned, resize cursors correct
+```
+
+## Previous Status: All Phases 1–6 Complete — Verified Working
+
 
 **Last Updated:** 2026-07-27 UTC (usage audit + supervisor files committed)
 
