@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # OpenOS Bench nightly worker: run-worker.sh <model-id> <run-dir>
-# Usage: run-worker.sh opencode-go/glm-5.3 /home/hermes/openos-runs/run-02-glm-5.3
+# Usage: run-worker.sh <provider/model> <path-to-run-dir>
+# Runs one autonomous overnight build session against the frozen task spec.
 set -euo pipefail
 MODEL="${1:?model id required}"
 RUNDIR="${2:?run dir required}"
-SPEC="/home/hermes/openos-bench/eval/task-spec.md"
+SPEC="$(cd "$(dirname "$0")" && pwd)/eval/task-spec.md"
 
 mkdir -p "$RUNDIR"
 cd "$RUNDIR"
