@@ -3,3 +3,5 @@ data/*.json
 data/wallpaper.*
 *.log
 .DS_Store
+.train-state
+eval/harness/results/*/0*.png
