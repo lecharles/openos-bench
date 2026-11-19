@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""OpenOS Bench - neutral cross-build harness v1.
+"""
+# Independent second-opinion harness (python/playwright). Official
+# instrument: eval/harness/clickpath.js (tier 1 per docs/EVALUATOR.md);
+# when the two disagree, both numbers ship and the delta is noted.
+OpenOS Bench - neutral cross-build harness v1.
 
 Usage: python3 scripts/bench.py <base_url> <out_dir>
 Scores any build against the frozen task spec with identical probes:
@@ -161,8 +165,3 @@ json.dump(rep, open(os.path.join(out, "harness-report.json"), "w"), indent=1)
 ok = sum(1 for v in rep["probes"].values() if v["pass"])
 print(f"HARNESS {base}: {ok}/{len(rep['probes'])} probes pass")
 for k, v in rep["probes"].items(): print(f"  {'PASS' if v['pass'] else 'fail'} {k}: {v['detail']}")
-
-
-> The official instrument is eval/harness/clickpath.js (tier 1).
-> This Python/Playwright crosscheck re-walks the same probe list independently;
-> when the two disagree, both numbers ship and the delta is noted.
