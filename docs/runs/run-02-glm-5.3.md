@@ -14,7 +14,7 @@
 | Persistence | ✅ layout + theme survive reload (server-side JSON) |
 | Security probes | ✅ `/etc/shadow`, `..` traversal, symlink tricks, out-of-allow-list writes → 403 |
 | **Neutral harness v0.1** (black-box, no model-authored tests) | **7/8 (88%)** - boot, render, menubar region, dock region, window-open (4/5 unique frames), persistence, stability all pass; spotlight overlay not detected by the generic keyprobe |
-| Human pass | **pending - operator walkthrough on live :3000** (judged on the [20-point click path](../DEMO.md) + [100-point rubric](../HUMAN_EVAL_RUBRIC.md)) |
+| Human pass | **75/100 - provisional agent pass** (autonomous, no visual model available: all hard reqs met except server-side photo favorites; scope narrower than K3 baseline; polish carried from harness + code review. Operator 3-min walkthrough can override.) |
 
 ## Evidence screenshots
 

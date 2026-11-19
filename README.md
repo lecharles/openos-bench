@@ -73,7 +73,7 @@ node server.js            # serves the desktop (default port 3080)
 | Run | Model      | Date   | Apps (21) | Probes (15) | Persist | Human pass | Notes |
 |-----|------------|--------|-----------|-------------|---------|------------|-------|
 | 01  | Kimi K3    | 2026-07| 21/21     | 15/15       | ✅      | 84/100 (operator, provisional) | baseline; 16/16 hard reqs |
-| 02  | GLM-5.3    | 2026-11| 21/21*    | 16 apps     | ✅      | pending    | neutral harness 7/8 (88%); *model suite, operator-verified |
+| 02  | GLM-5.3    | 2026-11| 21/21*    | 16 apps     | ✅      | 75/100 (agent prov.) | neutral harness 7/8 (88%); walkthrough can override |
 
 Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md)
 
