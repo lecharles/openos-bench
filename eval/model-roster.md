@@ -25,3 +25,5 @@ Excluded: GLM-5.3-Vision (tooling mismatch), GLM-Titanium-Preview (too large), Q
 Cross-lane build contract (both lanes): rundir `/home/hermes/openos-runs/run-<NN>-<slug>/`, tmux session `openos-run<NN>`, log `run-<NN>-<slug>.log`, state line `<NN> <slug> <rundir>` in `/home/hermes/openos-bench/.train-state`, key id from `/home/hermes/openos-runs/model-ids.map`. One concurrent build at a time; train.sh skips if any `openos-run` session is alive.
 
 Corroborating evidence: Hermes' independent crosscheck (Nov 19): K3 10/10 vs GLM 8/10 structural - agrees with Tier-1 ordering (80 vs 72).
+
+Freshness scan: `python3 scripts/scan-roster.py` (weekly, Sundays) writes `docs/roster-scans/<date>.md`; the newest scan wins slot decisions.
