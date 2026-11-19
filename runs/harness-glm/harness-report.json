@@ -1,6 +1,6 @@
 {
- "base": "http://local-port-1",
- "ts": "2026-11-19 04:23:58 PST",
+ "base": "http://127.0.0.1:3081",
+ "ts": "2026-11-19 04:31:53 PST",
  "probes": {
   "boot-paint": {
    "pass": true,
@@ -16,7 +16,7 @@
   },
   "spotlight-launch": {
    "pass": false,
-   "detail": "34 -> 34 after Enter on search"
+   "detail": "20 -> 20 after Enter on search"
   },
   "window-drag": {
    "pass": false,
@@ -32,7 +32,7 @@
   },
   "persist-layout": {
    "pass": true,
-   "detail": "34 -> 34 windows"
+   "detail": "20 -> 20 windows"
   },
   "sec-shadow": {
    "pass": true,
