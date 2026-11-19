@@ -1,0 +1,92 @@
+[
+  {
+    "id": "c1",
+    "first": "Ada",
+    "last": "Lovelace",
+    "phone": "+1 (555) 010-1815",
+    "email": "ada@analyticalengine.org",
+    "city": "London",
+    "company": "Analytical Engines Ltd."
+  },
+  {
+    "id": "c2",
+    "first": "Grace",
+    "last": "Hopper",
+    "phone": "+1 (555) 010-1906",
+    "email": "grace@navy.mil",
+    "city": "Arlington",
+    "company": "US Navy"
+  },
+  {
+    "id": "c3",
+    "first": "Alan",
+    "last": "Turing",
+    "phone": "+44 (20) 010-1912",
+    "email": "alan@bletchley.uk",
+    "city": "Manchester",
+    "company": "Bletchley Park"
+  },
+  {
+    "id": "c4",
+    "first": "Katherine",
+    "last": "Johnson",
+    "phone": "+1 (555) 010-1918",
+    "email": "katherine@nasa.gov",
+    "city": "Hampton",
+    "company": "NASA"
+  },
+  {
+    "id": "c5",
+    "first": "Linus",
+    "last": "Torvalds",
+    "phone": "+358 (40) 010-1969",
+    "email": "linus@kernel.org",
+    "city": "Helsinki",
+    "company": "Linux Foundation"
+  },
+  {
+    "id": "c6",
+    "first": "Margaret",
+    "last": "Hamilton",
+    "phone": "+1 (555) 010-1936",
+    "email": "margaret@mit.edu",
+    "city": "Cambridge",
+    "company": "MIT"
+  },
+  {
+    "id": "c7",
+    "first": "Barbara",
+    "last": "Liskov",
+    "phone": "+1 (555) 010-1939",
+    "email": "barbara@csail.mit.edu",
+    "city": "Boston",
+    "company": "MIT CSAIL"
+  },
+  {
+    "id": "c8",
+    "first": "Radia",
+    "last": "Perlman",
+    "phone": "+1 (555) 010-1951",
+    "email": "radia@sunbeam.net",
+    "city": "Boston",
+    "company": "Retired"
+  },
+  {
+    "id": "c9",
+    "first": "Guido",
+    "last": "van Rossum",
+    "phone": "+1 (555) 010-1956",
+    "email": "guido@python.org",
+    "city": "San Francisco",
+    "company": "Python Software Foundation"
+  },
+  {
+    "id": "c10",
+    "first": "Dana",
+    "last": "Nguyen",
+    "phone": "+1 (555) 010-1975",
+    "email": "dana@dyssonance.ai",
+    "city": "Cupertino",
+    "company": "Dyssonance"
+  }
+]

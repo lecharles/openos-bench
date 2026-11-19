@@ -1,0 +1,13 @@
+Standup — 9:30am
+
+Attendees: everyone
+
+- WM drag now uses pointer capture, no more lost drags at screen edge
+- Dock magnification curve tuned (cubic falloff feels smoother)
+- Trash restore verified end-to-end
+- Next: polish context menus, ship nightly build
+
+Action items:
+[ ] Dana: finalize icon set
+[x] Sam: settings persistence (server-side JSON)
+[ ] You: try right-clicking things

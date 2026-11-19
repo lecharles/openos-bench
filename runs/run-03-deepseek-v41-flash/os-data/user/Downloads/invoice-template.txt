@@ -1,0 +1,13 @@
+INVOICE #0001
+Date: __________
+Bill to: __________
+
+Description          Hours   Rate   Total
+------------------------------------------
+Window polishing      2      99     198
+Dock alignment        1      99      99
+Spotlight re-aiming   1      99      99
+------------------------------------------
+TOTAL                               396
+
+Thank you for your business!

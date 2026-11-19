@@ -1,0 +1,16 @@
+Welcome to OpenOS!
+
+This desktop runs entirely in your browser, backed by a small
+Node/Express server. A few things to try:
+
+  - Press Cmd+Space (or Ctrl+Space) for Spotlight
+  - Hover the Dock to see magnification
+  - Double-click folders and files on the Desktop
+  - Right-click the Desktop for more options
+  - Open Terminal and type "help"
+  - Change your wallpaper in System Settings
+
+Everything you see here persists on the server across reloads.
+Enjoy your stay.
+
+-- The OpenOS Team

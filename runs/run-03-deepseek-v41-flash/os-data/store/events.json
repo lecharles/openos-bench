@@ -1,0 +1,38 @@
+[
+  {
+    "id": "e1",
+    "date": "2026-11-19",
+    "time": "09:30",
+    "title": "Standup"
+  },
+  {
+    "id": "e2",
+    "date": "2026-11-19",
+    "time": "14:00",
+    "title": "Design Review"
+  },
+  {
+    "id": "e3",
+    "date": "2026-11-20",
+    "time": "11:00",
+    "title": "1:1 with Dana"
+  },
+  {
+    "id": "e4",
+    "date": "2026-11-21",
+    "time": "18:30",
+    "title": "Gym"
+  },
+  {
+    "id": "e5",
+    "date": "2026-11-22",
+    "time": "10:00",
+    "title": "Ship OpenOS Nightly"
+  },
+  {
+    "id": "e6",
+    "date": "2026-11-24",
+    "time": "19:00",
+    "title": "Dinner at Buca di Beppo"
+  }
+]

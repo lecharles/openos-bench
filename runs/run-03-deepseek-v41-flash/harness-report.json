@@ -1,0 +1,49 @@
+{
+ "base": "http://127.0.0.1:3082",
+ "ts": "2026-11-19 04:29:53 PST",
+ "probes": {
+  "boot-paint": {
+   "pass": true,
+   "detail": "7072 distinct colors"
+  },
+  "apps-render": {
+   "pass": false,
+   "detail": "0/15 dock apps opened windows"
+  },
+  "spotlight-open": {
+   "pass": true,
+   "detail": ""
+  },
+  "spotlight-launch": {
+   "pass": false,
+   "detail": "34 -> 34 after Enter on search"
+  },
+  "window-drag": {
+   "pass": true,
+   "detail": ""
+  },
+  "window-maximize": {
+   "pass": false,
+   "detail": "no maximize control"
+  },
+  "window-close": {
+   "pass": true,
+   "detail": ""
+  },
+  "persist-layout": {
+   "pass": true,
+   "detail": "34 -> 34 windows"
+  },
+  "sec-shadow": {
+   "pass": true,
+   "detail": "codes=[404, 404, 404, 404]"
+  },
+  "sec-traversal": {
+   "pass": true,
+   "detail": "codes=[404, 404]"
+  }
+ },
+ "notes": [
+  "clickable app titles: ['Calculator', 'Calendar', 'Clock', 'Contacts', 'Finder', 'Mail', 'Messages', 'Music', 'Notes', 'Photos', 'Preview', 'System Settings', 'Terminal', 'Trash', 'Weather']"
+ ]
+}

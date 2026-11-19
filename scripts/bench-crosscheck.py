@@ -13,7 +13,16 @@ gets custom tooling credit in these numbers - this is the yardstick.
 import sys, os, json, time, urllib.request
 from playwright.sync_api import sync_playwright
 
-EXE = os.environ.get("CHROMIUM_PATH") or "chromium"
+def find_chromium():
+    import glob
+    env = os.environ.get("CHROMIUM_PATH")
+    if env and os.path.exists(env): return env
+    import shutil
+    for c in ("chromium", "chromium-browser", "google-chrome"):
+        if shutil.which(c): return shutil.which(c)
+    hits = sorted(glob.glob(os.path.expanduser("~/.cache/ms-playwright/chromium-*/chrome-linux*/chrome")), reverse=True)
+    return hits[0] if hits else "chromium"
+EXE = find_chromium()
 base, out = sys.argv[1], sys.argv[2]
 os.makedirs(out, exist_ok=True)
 CFG = {"app": '[title="{app}"], [aria-label="{app}"], [data-app="{app_l}"]',

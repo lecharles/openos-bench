@@ -1,0 +1,7 @@
+{
+  "app": "[data-app=\"{app_l}\"], [aria-label=\"{app}\"], [title=\"{app}\"]",
+  "close": "[aria-label=\"Close window\"]",
+  "maximize": "[aria-label=\"Zoom window\"]",
+  "restore": "[aria-label=\"Zoom window\"]",
+  "windows": "[class*=\"win-title\"], [class*=\"window-body\"]"
+}
