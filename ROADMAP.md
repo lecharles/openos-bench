@@ -45,4 +45,8 @@ All available on the operator's inference key; no new accounts needed. DeepSeek 
 - 1 build nightly (overnight agent session, fixed task spec, session ceiling)
 - 1 commit train every morning (score + screenshots + story page) - the git history IS the benchmark's credibility
 - E2E harness rebuild is task #1 (Nov 19) - every subsequent run scores itself automatically
+## Freshness gate (operator rule, Nov 19)
+
+Every roster row benches the LATEST refresh of its lineage at slot time (release date + exact version string in the story page). "post-Jul 2026" is a floor, not a target - K3.1-style swaps happen automatically at slot time and are recorded with why.
+
 - Public hygiene gate before every push: no hosts, IPs, provider identities, names, or secrets in anything public

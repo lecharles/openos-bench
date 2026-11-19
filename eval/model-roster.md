@@ -15,9 +15,12 @@ One row per model. Status: `done` (scored + published), `building`, `queued`, `b
 | 09 | Hunyuan hy4-preview | Tencent | post-Jul 2026 | Nov 25 | queued | | | |
 | 10 | Qwen3.8-27B | Alibaba | Aug 5, top OSS download (~6.9M) | Nov 26 | queued | | | |
 | 11 | omen-alpha | (key listing) | Nov 2026 wildcard | Nov 27 | queued | | | |
-| 12+ | wildcards: qwen4-max, step-5-preview, Nemotron-Labs Competitive-Coding 550B (coding specialist - availability check at slot), + Dec drops | various | rolling | daily slots | queued | | | |
+| 12+ | **Kimi K3.1** | Moonshot | current lineage refresh (K3 GA was Jul 2026) | Nov 28 | queued | | | |
+| 13+ | wildcards: qwen4-max, step-5-preview, Nemotron-Labs Competitive-Coding 550B (coding specialist - availability check at slot), + Dec drops | various | rolling | daily slots | queued | | | |
 
 Notes:
+- **Freshness gate (operator rule, Nov 19):** every row benches the LATEST refresh of that lineage at slot time - release date + exact version string recorded in the story page. "post-Jul 2026" is a floor, not a target. Slot-time web check confirms nothing newer exists; if newer, it swaps in and the row records why. Example: Kimi line is already on 3.1 while our baseline ran July's K3 - hence run-12 measures whether the same lineage got better.
+- Run #, model, and slot date come from this file only; `train.sh` reads the first `queued` row each morning.
 - Release-window verification happens at slot time (web check); if a listed model predates July it gets swapped for the newest comparable release and the row records why.
 - DeepSeek was excluded Sep 12; operator lifted the exclusion Nov 19 04:04 PT for this bench. If endpoint region-blocks at run time, row flips to `blocked (reason)` and the next queued model moves up.
 - Every `done` row must link a story page with: scorecard, evidence gallery, worked/failed split, verdict vs baseline.
