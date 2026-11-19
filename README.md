@@ -14,10 +14,9 @@ This project also doubles as a story about agent-built software: how an overnigh
 
 Built by an OpenCode coding agent driving the model over multiple overnight sessions (implementation pass + logo fix pass + final polish pass), on an Ubuntu server, served over HTTP from a small Node/Express backend.
 
-Current state (verified with the bundled E2E suites):
-- **21/21 apps render** (`node scripts/smoke.js`)
-- **15/15 interaction probes pass** (window ops, dock, menus, persistence)
-- Persistence verified across reloads (window geometry, theme, trash)
+Run-01 verification (recorded in STATUS.md and the supervisor build logs from the July sessions):
+- **21/21 apps render**, **15/15 interaction probes pass**, persistence verified across reloads
+- The E2E harness itself was run ephemerally in those sessions and is **not yet committed** - rebuilding it as a permanent part of the benchmark is task #1 of this repo's roadmap (see `docs/` and the supervisor logs for what was probed)
 
 Feature highlights of the baseline:
 - **Finder**, macOS-grade: icon / list / column / gallery views, sidebar with Favorites, Locations and Tags, Get Info, inline rename, context menus, path + status bar with real free-space stats
@@ -32,9 +31,10 @@ Feature highlights of the baseline:
 ```
 server.js, routes/      Express backend (fs API with path allow-lists)
 public/                 frontend (desktop shell, apps, styles)
-scripts/                smoke + persistence E2E suites, run workers
+supervisor/             autonomous phase runners + build logs (the overnight agent harness)
 docs/                   build stories and pass notes
-eval/                   task spec + model adapter contract (see below)
+eval/                   task spec + model adapter contract
+screenshots/            per-run evidence (filling in with run-02)
 ```
 
 ## How to run
@@ -42,8 +42,8 @@ eval/                   task spec + model adapter contract (see below)
 ```bash
 npm install
 node server.js            # serves the desktop (default port 3080)
-node scripts/smoke.js     # E2E app-render + interaction probes
-node scripts/persist.js   # persistence checks
+# E2E harness is being re-committed as roadmap task #1;
+# until then, STATUS.md + supervisor/ logs are the run-01 evidence.
 ```
 
 ## The benchmark loop
