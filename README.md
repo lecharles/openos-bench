@@ -71,8 +71,11 @@ node server.js            # serves the desktop (default port 3080)
 | Run | Model      | Date   | Apps (21) | Probes (15) | Persist | Human pass | Notes |
 |-----|------------|--------|-----------|-------------|---------|------------|-------|
 | 01  | Kimi K3    | 2026-07| 21/21     | 15/15       | ✅      | ✅         | baseline; 3 overnight agent sessions |
+| 02  | GLM-5.3    | 2026-11| 21/21*    | 16 apps     | ✅      | pending    | *model's own suite, operator-verified; 80-min single session; full build in runs/ |
 
-The bench fills nightly: GLM-5.3, Qwen3.8-Max, MiniMax-M3, MiMo-v2.5-Pro, Kimi-K2.7-Code, LongCat-2.0, Hunyuan hy4-preview, plus December wildcards. Full schedule and scoring plan in [ROADMAP.md](ROADMAP.md).
+Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md)
+
+The bench fills nightly: GLM-5.3 (done, run-02), Qwen3.8-Max, MiniMax-M3, MiMo-v2.5-Pro, Kimi-K2.7-Code, LongCat-2.0, Hunyuan hy4-preview, plus December wildcards. Full schedule and scoring plan in [ROADMAP.md](ROADMAP.md).
 
 ## License
 

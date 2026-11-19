@@ -1,0 +1,14 @@
+[
+  {
+    "id": "n1",
+    "body": "Welcome to Notes\n\nEverything you type here is saved to the server automatically. Create a new note with the + button, or search across all notes with the search field.\n\nTry deleting me. I will not mind.",
+    "updated": 1794982617419,
+    "created": 1794982617419
+  },
+  {
+    "id": "n2",
+    "body": "Grocery list\n\n- Espresso beans\n- Sourdough\n- Olive oil\n- Raspberries\n- Parmesan",
+    "updated": 1795065417419,
+    "created": 1795061817419
+  }
+]

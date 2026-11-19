@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>OpenOS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ea8fe'/%3E%3Cstop offset='1' stop-color='%230a5cf5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='42' fill='url(%23g)'/%3E%3Cpath d='M18 58 h28 a6 6 0 0 1 6 6 v0' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/apps.css">
+</head>
+<body data-theme="light" data-accent="blue">
+
+<div id="boot" aria-label="Starting up">
+  <div class="boot-logo">
+    <svg viewBox="0 0 100 100" width="92" height="92">
+      <defs><linearGradient id="bootg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6ea8fe"/><stop offset="1" stop-color="#0a5cf5"/>
+      </linearGradient></defs>
+      <circle cx="50" cy="50" r="42" fill="url(#bootg)"/>
+      <path d="M18 58 h28 a6 6 0 0 1 6 6" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="boot-bar"><div id="boot-progress"></div></div>
+</div>
+
+<div id="wallpaper" aria-hidden="true"></div>
+<div id="desktop"><div id="desktop-icons"></div></div>
+
+<div id="menubar" role="menubar" aria-label="Menu bar"></div>
+
+<div id="dock-wrap"><div id="dock" role="toolbar" aria-label="Dock"></div></div>
+
+<div id="spotlight" hidden>
+  <div class="spot-panel" role="dialog" aria-label="Spotlight Search">
+    <div class="spot-input-row">
+      <span class="spot-mag" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="#8a8a8e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3 L20 20"/></g></svg></span>
+      <input id="spotlight-input" type="text" placeholder="Spotlight Search" autocomplete="off" spellcheck="false" aria-label="Spotlight Search">
+    </div>
+    <div id="spotlight-results" role="listbox"></div>
+  </div>
+</div>
+
+<div id="appswitcher" hidden aria-label="App switcher"></div>
+
+<div id="toasts" aria-live="polite"></div>
+<div id="ctx-layer"></div>
+
+<div id="sleep" hidden>
+  <div class="sleep-inner">
+    <svg viewBox="0 0 100 100" width="64" height="64" opacity="0.85">
+      <defs><linearGradient id="sleepg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6ea8fe"/><stop offset="1" stop-color="#0a5cf5"/>
+      </linearGradient></defs>
+      <circle cx="50" cy="50" r="42" fill="url(#sleepg)"/>
+      <path d="M18 58 h28 a6 6 0 0 1 6 6" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+    </svg>
+    <div class="sleep-clock" id="sleep-clock"></div>
+    <div class="sleep-hint">Click anywhere or press any key to wake</div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>

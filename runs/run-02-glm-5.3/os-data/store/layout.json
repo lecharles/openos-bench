@@ -1,0 +1,224 @@
+{
+  "windows": [
+    {
+      "id": "w1",
+      "app": "notes",
+      "x": 270,
+      "y": 100,
+      "w": 940,
+      "h": 600,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "noteId": "n1"
+      }
+    },
+    {
+      "id": "w2",
+      "app": "calculator",
+      "x": 536,
+      "y": 84,
+      "w": 300,
+      "h": 470,
+      "minimized": false,
+      "maximized": false,
+      "payload": {}
+    },
+    {
+      "id": "w3",
+      "app": "terminal",
+      "x": 332,
+      "y": 108,
+      "w": 760,
+      "h": 480,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "cwd": "/workspace/run-02/os-data/user"
+      }
+    },
+    {
+      "id": "w4",
+      "app": "finder",
+      "x": 288,
+      "y": 132,
+      "w": 900,
+      "h": 560,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "path": "~/Documents",
+        "view": "icons"
+      }
+    },
+    {
+      "id": "w5",
+      "app": "trash",
+      "x": 404,
+      "y": 156,
+      "w": 720,
+      "h": 480,
+      "minimized": false,
+      "maximized": false,
+      "payload": {}
+    },
+    {
+      "id": "w6",
+      "app": "settings",
+      "x": 360,
+      "y": 180,
+      "w": 860,
+      "h": 600,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "pane": "appearance"
+      }
+    },
+    {
+      "id": "w7",
+      "app": "calendar",
+      "x": 336,
+      "y": 204,
+      "w": 960,
+      "h": 640,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "view": {
+          "y": 2026,
+          "m": 10
+        }
+      }
+    },
+    {
+      "id": "w8",
+      "app": "weather",
+      "x": 230,
+      "y": 60,
+      "w": 860,
+      "h": 600,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "city": 0
+      }
+    },
+    {
+      "id": "w9",
+      "app": "preview",
+      "x": 236,
+      "y": 84,
+      "w": 900,
+      "h": 620,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "path": null,
+        "showThumbs": true
+      }
+    },
+    {
+      "id": "w10",
+      "app": "clock",
+      "x": 392,
+      "y": 108,
+      "w": 640,
+      "h": 440,
+      "minimized": false,
+      "maximized": false,
+      "payload": {}
+    },
+    {
+      "id": "w11",
+      "app": "contacts",
+      "x": 308,
+      "y": 132,
+      "w": 860,
+      "h": 560,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "contactId": "c1"
+      }
+    },
+    {
+      "id": "w12",
+      "app": "music",
+      "x": 294,
+      "y": 156,
+      "w": 940,
+      "h": 640,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "view": "albums",
+        "albumId": null
+      }
+    },
+    {
+      "id": "w13",
+      "app": "mail",
+      "x": 290,
+      "y": 180,
+      "w": 1000,
+      "h": 640,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "box": "inbox"
+      }
+    },
+    {
+      "id": "w14",
+      "app": "terminal",
+      "x": 436,
+      "y": 204,
+      "w": 760,
+      "h": 480,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "cwd": "/workspace/run-02/os-data/user"
+      }
+    },
+    {
+      "id": "w15",
+      "app": "photos",
+      "x": 210,
+      "y": 60,
+      "w": 900,
+      "h": 620,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "view": "library"
+      }
+    },
+    {
+      "id": "w16",
+      "app": "textedit",
+      "x": 356,
+      "y": 84,
+      "w": 660,
+      "h": 580,
+      "minimized": false,
+      "maximized": false,
+      "payload": {
+        "path": null
+      }
+    },
+    {
+      "id": "w17",
+      "app": "about",
+      "x": 522,
+      "y": 108,
+      "w": 380,
+      "h": 430,
+      "minimized": false,
+      "maximized": false,
+      "payload": {}
+    }
+  ],
+  "desktopIcons": {}
+}
