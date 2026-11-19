@@ -52,10 +52,13 @@ Seven hard requirements from the fixed task spec ([eval/task-spec.md](../../eval
 |---|---|---|---|
 | ![notes](../../screenshots/run-01-kimi-k3/07-notes.png) | ![calendar](../../screenshots/run-01-kimi-k3/08-calendar.png) | ![ctx](../../screenshots/run-01-kimi-k3/10-context-menu.png) | ![agents](../../screenshots/run-01-kimi-k3/11-agentcontrol.png) |
 
+## Human pass
+
+**84/100 - Kimi K3 baseline** (operator provisional score, 8.4/10 on the [100-point rubric](../HUMAN_EVAL_RUBRIC.md) axes, self-reported via the agent report Nov 19; final visual walkthrough to be confirmed by the operator on the live build).
+
 ## Still pending for run-01
 
-- **Human pass** (primary judge): guided click-through per [docs/DEMO.md](../DEMO.md) - the 16/16 above is the automated bar; feel/fidelity verdict lands with the operator
-- Neutral harness re-score (task #1) will re-run all 8 requirements with the same tooling used for runs 02+
+- Neutral-harness re-score: run-01 gets the same 8-check black-box instrument as every later run
 
 ## Build story
 

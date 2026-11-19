@@ -13,8 +13,8 @@
 | Apps in dock | 16 (finder, launchpad, notes, calendar, mail, weather, music, photos, contacts, calculator, preview, textedit, terminal, clock, settings, trash) |
 | Persistence | ✅ layout + theme survive reload (server-side JSON) |
 | Security probes | ✅ `/etc/shadow`, `..` traversal, symlink tricks, out-of-allow-list writes → 403 |
-| Boot experience | ✅ ~2s boot screen with progress bar (model's own flourish) |
-| Human pass | pending (morning walkthrough) |
+| **Neutral harness v0.1** (black-box, no model-authored tests) | **7/8 (88%)** - boot, render, menubar region, dock region, window-open (4/5 unique frames), persistence, stability all pass; spotlight overlay not detected by the generic keyprobe |
+| Human pass | **pending - operator walkthrough on live :3000** (judged on the [20-point click path](../DEMO.md) + [100-point rubric](../HUMAN_EVAL_RUBRIC.md)) |
 
 ## Evidence screenshots
 
@@ -22,7 +22,7 @@
 ![Finder](../../screenshots/run-02-glm-5.3/finder.png)
 ![Notes](../../screenshots/run-02-glm-5.3/notes.png)
 
-Captured with the run's own CDP screenshot tool against the live server. Note: window-state captures show subtle deltas only - the neutral cross-model screenshot harness (roadmap task #1) will standardize this for all future runs.
+Three states only, on purpose: the cross-run capture quirk we hit (window-state PNG deltas of ~7 bytes - real but barely visible rendering differences in headless) meant we declined to publish 11 shots that couldn't be honestly verified state-by-state. The neutral harness's own captures (in `eval/harness/results/run-02-glm-5.3/`) cover boot, spotlight-attempt, dock-click, and post-reload frames. Full gallery returns with the operator's live walkthrough.
 
 ## Full build
 
