@@ -2,6 +2,18 @@
 
 **A benchmark for how well language models can build a desktop operating system experience.**
 
+Same task since July 2026. New open-weight model every night. Daily evidence in the open.
+
+**→ [ROADMAP.md](ROADMAP.md): 10+ scored runs by New Year's Eve.**
+
+## The baseline, photographed
+
+| Desktop | Finder | Spotlight |
+|---|---|---|
+| ![Desktop](screenshots/run-01-kimi-k3/desktop.jpg) | ![Finder](screenshots/run-01-kimi-k3/finder.jpg) | ![Spotlight](screenshots/run-01-kimi-k3/spotlight.jpg) |
+
+Full run story: [docs/runs/run-01-kimi-k3.md](docs/runs/run-01-kimi-k3.md)
+
 Same task, new model, every time. The task: build a macOS-class desktop that runs in the browser on a Linux server - Finder, Dock, Spotlight, Launchpad, windows with the animations that make macOS feel like macOS, and a suite of working apps (Mail, Calendar, Chat, Notes, Weather, Preview, Terminal, and GUI panels for AI coding agents). Score it with automated end-to-end probes plus a human pass. Collect the screenshots. Repeat whenever a notable new model ships.
 
 ## Why
@@ -33,8 +45,9 @@ server.js, routes/      Express backend (fs API with path allow-lists)
 public/                 frontend (desktop shell, apps, styles)
 supervisor/             autonomous phase runners + build logs (the overnight agent harness)
 docs/                   build stories and pass notes
+docs/runs/              one story page per scored run (run-01: Kimi K3)
 eval/                   task spec + model adapter contract
-screenshots/            per-run evidence (filling in with run-02)
+screenshots/            per-run evidence (<run-id>/ galleries, committed with each score)
 ```
 
 ## How to run
@@ -59,7 +72,7 @@ node server.js            # serves the desktop (default port 3080)
 |-----|------------|--------|-----------|-------------|---------|------------|-------|
 | 01  | Kimi K3    | 2026-07| 21/21     | 15/15       | ✅      | ✅         | baseline; 3 overnight agent sessions |
 
-Next runs queued: newer open-weight releases as they land.
+The bench fills nightly: GLM-5.3, Qwen3.8-Max, MiniMax-M3, MiMo-v2.5-Pro, Kimi-K2.7-Code, LongCat-2.0, Hunyuan hy4-preview, plus December wildcards. Full schedule and scoring plan in [ROADMAP.md](ROADMAP.md).
 
 ## License
 
