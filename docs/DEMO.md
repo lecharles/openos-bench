@@ -35,3 +35,11 @@ The 3-minute tour judges **feel**, which automated probes cannot. Walk this path
 ## Where to click for each run
 
 - Run-01 (Kimi K3) and each subsequent run keep the same path; only the build changes. Run URLs and start commands are in each run's story page under `docs/runs/`.
+
+## Deep-dive scoring instrument
+
+The 20-point sheet above is the quick pass. For formal grading, use the 100-point weighted rubric: [docs/HUMAN_EVAL_RUBRIC.md](HUMAN_EVAL_RUBRIC.md) (Visual Fidelity 30 / App Functionality 30 / Agent+VPS Apps 25 / Performance+Persistence 15).
+
+## K3 reference captures
+
+Step-by-step live captures of the baseline demo path: [`screenshots/run-01-kimi-k3/demo/`](../screenshots/run-01-kimi-k3/demo/) (boot, Finder, Spotlight, notes, post-reload persistence) plus the full 11-state evidence gallery in [`screenshots/run-01-kimi-k3/`](../screenshots/run-01-kimi-k3/).
