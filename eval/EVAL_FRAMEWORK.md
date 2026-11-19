@@ -1,6 +1,6 @@
 # OpenOS Eval — beautiful minimal Mac VPS desktop (4+4 apps), LLM-swappable
 
-> Reference implementation lives at `/root/kimi-browser-desktop` (legacy 21-app
+> Reference implementation lives at the Run-01 baseline in this repo (21-app
 > desktop, Express + Socket.IO on :3080). This repo rebuilds the **same minimal
 > OpenOS**: 4 GUI shell/beauty apps + 4 conversational agent GUIs, ≤10 apps total.
 
@@ -17,8 +17,8 @@ Focus: **beautiful desktop + agent discussion**, not boring email/word-processin
 ## Quick start (after Day 1)
 
 ```bash
-cd /root/openos-eval
-LLM_PROVIDER=kimi-k3 LLM_MODEL=opencode-go/kimi-k3 node server.js
+cd openos-bench
+node server.js   # provider/model configured via your own adapter env
 # open http://localhost:3080
 ```
 

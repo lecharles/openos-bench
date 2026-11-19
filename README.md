@@ -8,11 +8,11 @@ Same task since July 2026. New open-weight model every night. Daily evidence in 
 
 ## The baseline, photographed
 
-| Desktop | Finder | Spotlight |
-|---|---|---|
-| ![Desktop](screenshots/run-01-kimi-k3/desktop.jpg) | ![Finder](screenshots/run-01-kimi-k3/finder.jpg) | ![Spotlight](screenshots/run-01-kimi-k3/spotlight.jpg) |
+| Desktop | Finder (column view) | Spotlight | Launchpad |
+|---|---|---|---|
+| ![Desktop](screenshots/run-01-kimi-k3/01-desktop.png) | ![Finder](screenshots/run-01-kimi-k3/05-finder-columns.png) | ![Spotlight](screenshots/run-01-kimi-k3/02-spotlight.png) | ![Launchpad](screenshots/run-01-kimi-k3/09-launchpad.png) |
 
-Full run story: [docs/runs/run-01-kimi-k3.md](docs/runs/run-01-kimi-k3.md)
+Full evidence gallery (11 states), grading rubric and scorecard: [docs/runs/run-01-kimi-k3.md](docs/runs/run-01-kimi-k3.md). Want to judge it yourself? The 3-minute click path is [docs/DEMO.md](docs/DEMO.md).
 
 Same task, new model, every time. The task: build a macOS-class desktop that runs in the browser on a Linux server - Finder, Dock, Spotlight, Launchpad, windows with the animations that make macOS feel like macOS, and a suite of working apps (Mail, Calendar, Chat, Notes, Weather, Preview, Terminal, and GUI panels for AI coding agents). Score it with automated end-to-end probes plus a human pass. Collect the screenshots. Repeat whenever a notable new model ships.
 
