@@ -61,8 +61,6 @@ node server.js            # serves the desktop (default port 3080)
 
 Next runs queued: newer open-weight releases as they land.
 
-## House rules
+## License
 
-- Public-safe by construction: no hostnames, IPs, provider identities, credentials, or private paths in git - checked before every commit.
-- Every "done" is a verified push to `main`.
-- MIT - fork it, make it your own, run your own model bake-off.
+MIT - fork it, make it your own, run your own model bake-off.
