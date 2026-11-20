@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenOS</title>
+<link rel="preconnect" href="/">
+<link rel="stylesheet" href="/css/style.css">
+<script>
+// Pre-paint theme restore (avoids light/dark flash); Persistence re-applies authoritatively at boot
+try {
+  var t = localStorage.getItem('kbd-theme');
+  if (t) document.documentElement.setAttribute('data-theme', t);
+} catch (e) {}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23222'/><text x='16' y='23' text-anchor='middle' font-size='20' font-weight='600' fill='white'>O</text></svg>">
+</head>
+<body>
+
+<!-- Desktop Wallpaper -->
+<div id="wallpaper"></div>
+
+<!-- Desktop Area -->
+<div id="desktop">
+  <div id="desktop-icons"></div>
+</div>
+
+<!-- Menu Bar -->
+<div id="menubar">
+  <div class="menubar-left">
+    <span class="apple-menu" id="apple-menu-btn" title="Apple menu"></span>
+    <span class="menu-item" data-menu="finder">Finder</span>
+    <span class="menu-item" data-menu="file">File</span>
+    <span class="menu-item" data-menu="edit">Edit</span>
+    <span class="menu-item" data-menu="view">View</span>
+    <span class="menu-item" data-menu="go">Go</span>
+    <span class="menu-item" data-menu="window">Window</span>
+    <span class="menu-item" data-menu="help">Help</span>
+  </div>
+  <div class="menubar-right">
+    <span class="menubar-clock" id="menubar-clock"></span>
+    <span class="menubar-icon" id="control-center-btn" title="Control Center">◉</span>
+    <span class="menubar-icon" id="spotlight-btn" title="Spotlight Search">⌕</span>
+  </div>
+</div>
+
+<!-- Active App Menu -->
+<div id="active-app-menu" class="menubar-app-name"></div>
+
+<!-- Dock -->
+<div id="dock-container">
+  <div id="dock">
+    <div class="dock-item" data-app="finder" title="Finder"><span class="dock-icon">📁</span><span class="dock-label">Finder</span></div>
+    <div class="dock-item" data-app="calendar" title="Calendar"><span class="dock-icon">📅</span><span class="dock-label">Calendar</span></div>
+    <div class="dock-item" data-app="notes" title="Notes"><span class="dock-icon">📝</span><span class="dock-label">Notes</span></div>
+    <div class="dock-item" data-app="reminders" title="Reminders"><span class="dock-icon">✅</span><span class="dock-label">Reminders</span></div>
+    <div class="dock-item" data-app="mail" title="Mail"><span class="dock-icon">📧</span><span class="dock-label">Mail</span></div>
+    <div class="dock-item" data-app="messages" title="Messages"><span class="dock-icon">💬</span><span class="dock-label">Messages</span></div>
+    <div class="dock-sep"></div>
+    <div class="dock-item" data-app="photos" title="Photos"><span class="dock-icon">🖼️</span><span class="dock-label">Photos</span></div>
+    <div class="dock-item" data-app="music" title="Music"><span class="dock-icon">🎵</span><span class="dock-label">Music</span></div>
+    <div class="dock-item" data-app="weather" title="Weather"><span class="dock-icon">🌤️</span><span class="dock-label">Weather</span></div>
+    <div class="dock-item" data-app="clock" title="Clock"><span class="dock-icon">🕐</span><span class="dock-label">Clock</span></div>
+    <div class="dock-item" data-app="calculator" title="Calculator"><span class="dock-icon">🔢</span><span class="dock-label">Calculator</span></div>
+    <div class="dock-item" data-app="contacts" title="Contacts"><span class="dock-icon">👤</span><span class="dock-label">Contacts</span></div>
+    <div class="dock-sep"></div>
+    <div class="dock-item" data-app="textedit" title="Text Editor"><span class="dock-icon">📄</span><span class="dock-label">TextEdit</span></div>
+    <div class="dock-item" data-app="preview" title="Preview"><span class="dock-icon">👁️</span><span class="dock-label">Preview</span></div>
+    <div class="dock-item" data-app="terminal" title="Terminal"><span class="dock-icon">⬛</span><span class="dock-label">Terminal</span></div>
+    <div class="dock-item" data-app="activity" title="Activity Monitor"><span class="dock-icon">📊</span><span class="dock-label">Activity</span></div>
+    <div class="dock-item" data-app="settings" title="System Settings"><span class="dock-icon">⚙️</span><span class="dock-label">Settings</span></div>
+    <div class="dock-sep"></div>
+    <div class="dock-item" data-app="hermes" title="Hermes"><span class="dock-icon">🧠</span><span class="dock-label">Hermes</span></div>
+    <div class="dock-item" data-app="openclaw" title="OpenClaw"><span class="dock-icon">🦞</span><span class="dock-label">OpenClaw</span></div>
+    <div class="dock-item" data-app="agentcontrol" title="Agent Control"><span class="dock-icon">🛡️</span><span class="dock-label">Control</span></div>
+    <div class="dock-sep"></div>
+    <div class="dock-item" data-app="trash" title="Trash"><span class="dock-icon">🗑️</span><span class="dock-label">Trash</span></div>
+  </div>
+</div>
+
+<!-- Windows Container -->
+<div id="windows-container"></div>
+
+<!-- Spotlight -->
+<div id="spotlight-overlay" class="overlay hidden">
+  <div class="spotlight-box">
+    <input type="text" id="spotlight-input" placeholder="Spotlight Search" autocomplete="off">
+    <div id="spotlight-results"></div>
+  </div>
+</div>
+
+<!-- Notification Center -->
+<div id="notification-overlay" class="overlay hidden">
+  <div class="notification-panel">
+    <h2>Notifications</h2>
+    <div id="notification-list"></div>
+  </div>
+</div>
+
+<!-- Control Center -->
+<div id="control-overlay" class="overlay hidden">
+  <div class="control-panel">
+    <h2>Control Center</h2>
+    <div class="control-grid">
+      <div class="control-item" data-action="wifi"><span>📶</span> Wi-Fi</div>
+      <div class="control-item" data-action="bluetooth"><span>🔵</span> Bluetooth</div>
+      <div class="control-item" data-action="airdrop"><span>📡</span> AirDrop</div>
+      <div class="control-item" data-action="dnd"><span>🌙</span> Focus</div>
+    </div>
+    <div class="control-slider">
+      <span>☀️</span>
+      <input type="range" id="cc-brightness" min="20" max="100" step="1" aria-label="Brightness">
+      <label id="cc-brightness-label">Brightness</label>
+    </div>
+    <div class="control-slider">
+      <span>🔊</span>
+      <input type="range" id="cc-volume" min="0" max="100" step="1" aria-label="Volume">
+      <label id="cc-volume-label">Volume 60%</label>
+    </div>
+  </div>
+</div>
+
+<!-- Screen brightness dim layer -->
+<div id="brightness-dim"></div>
+
+<!-- Launchpad -->
+<div id="launchpad-overlay" class="overlay hidden">
+  <div class="launchpad-grid" id="launchpad-grid"></div>
+</div>
+
+<!-- Desktop context menu -->
+<div id="context-menu" class="context-menu hidden">
+  <div class="context-item">New Folder</div>
+  <div class="context-item">New File</div>
+  <div class="context-sep"></div>
+  <div class="context-item">Change Wallpaper…</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/core/app-registry.js" defer></script>
+<script src="/js/core/desktop.js" defer></script>
+<script src="/js/core/window-manager.js" defer></script>
+<script src="/js/core/dock.js" defer></script>
+<script src="/js/core/menubar.js" defer></script>
+<script src="/js/core/spotlight.js" defer></script>
+<script src="/js/core/launchpad.js" defer></script>
+<script src="/js/core/notifications.js" defer></script>
+<script src="/js/core/control-center.js" defer></script>
+<script src="/js/core/persistence.js" defer></script>
+<script src="/js/apps/finder.js" defer></script>
+<script src="/js/apps/calendar.js" defer></script>
+<script src="/js/apps/notes.js" defer></script>
+<script src="/js/apps/clock.js" defer></script>
+<script src="/js/apps/calculator.js" defer></script>
+<script src="/js/apps/weather.js" defer></script>
+<script src="/js/apps/mail.js" defer></script>
+<script src="/js/apps/messages.js" defer></script>
+<script src="/js/apps/contacts.js" defer></script>
+<script src="/js/apps/photos.js" defer></script>
+<script src="/js/apps/music.js" defer></script>
+<script src="/js/apps/reminders.js" defer></script>
+<script src="/js/apps/preview.js" defer></script>
+<script src="/js/apps/textedit.js" defer></script>
+<script src="/js/apps/activity.js" defer></script>
+<script src="/js/apps/settings.js" defer></script>
+<script src="/js/apps/terminal.js" defer></script>
+<script src="/js/apps/trash.js" defer></script>
+<script src="/js/apps/hermes.js" defer></script>
+<script src="/js/apps/openclaw.js" defer></script>
+<script src="/js/apps/agentcontrol.js" defer></script>
+<script src="/js/main.js" defer></script>
+</body>
+</html>

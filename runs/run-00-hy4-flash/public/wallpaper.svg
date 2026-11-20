@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2880" height="1920" viewBox="0 0 2880 1920">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1033"/>
+      <stop offset="0.45" stop-color="#151a52"/>
+      <stop offset="1" stop-color="#2b1055"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5e9dff" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#3b5bff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#3b5bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ff6ec7" stop-opacity="0.85"/>
+      <stop offset="0.6" stop-color="#b14bff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#b14bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow3" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#33e0ff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#33e0ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="48"/>
+    </filter>
+    <linearGradient id="wave" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7b6bff" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#0a1033" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="2880" height="1920" fill="url(#base)"/>
+  <ellipse cx="760" cy="520" rx="980" ry="820" fill="url(#glow1)" filter="url(#soft)"/>
+  <ellipse cx="2320" cy="340" rx="1050" ry="760" fill="url(#glow2)" filter="url(#soft)"/>
+  <ellipse cx="1700" cy="1720" rx="1200" ry="720" fill="url(#glow3)" filter="url(#soft)"/>
+  <g opacity="0.55">
+    <path d="M0 1240 C420 1040 760 1420 1180 1240 S2000 980 2880 1260 L2880 1920 L0 1920 Z" fill="url(#wave)"/>
+    <path d="M0 1460 C520 1240 880 1640 1320 1450 S2140 1220 2880 1480 L2880 1920 L0 1920 Z" fill="url(#wave)" opacity="0.6"/>
+  </g>
+  <g fill="#ffffff" opacity="0.30">
+    <circle cx="360" cy="360" r="2.2"/><circle cx="620" cy="230" r="1.6"/><circle cx="980" cy="410" r="1.8"/>
+    <circle cx="1240" cy="180" r="2.4"/><circle cx="1510" cy="330" r="1.5"/><circle cx="1820" cy="200" r="2"/>
+    <circle cx="2130" cy="450" r="1.7"/><circle cx="2450" cy="260" r="2.3"/><circle cx="2700" cy="520" r="1.6"/>
+    <circle cx="440" cy="760" r="1.5"/><circle cx="880" cy="680" r="2"/><circle cx="1660" cy="620" r="1.6"/>
+    <circle cx="2250" cy="780" r="2.1"/><circle cx="2620" cy="900" r="1.7"/>
+  </g>
+</svg>
