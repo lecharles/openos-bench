@@ -9,8 +9,11 @@ Same frozen task spec ([eval/task-spec.md](../../eval/task-spec.md)), same empty
 | 1 | 01 | Kimi K3 | Jul | **80** (struct) | pending re-run | 84/100 (operator, provisional) | 3 overnight |
 | 2= | 02 | GLM-5.3 | Nov 18 | **72** (struct) | 7/8 (88%) | not yet walked | 1 × 80 min |
 | 2= | 03 | Qwen3.8-Max | Nov 19 | **72** (struct) | 7/8 (88%) | not yet walked | 1 × 82 min |
+| – | 03 alias* | DeepSeek-V4.1-Flash | Nov 19 | pending (struct) | 7/10 crosscheck (2nd opinion) | not yet walked | 1 × ~72 min |
 
 Corroborating: Hermes' independent crosscheck (Nov 19) put K3 10/10 vs GLM 8/10 structural - ordering agrees with the board.
+
+\* **Numbering collision, honestly kept:** two lanes both fired at run-03 on Nov 19 night. Train state says Qwen (03:58) is the official build-order 03; DeepSeek-V4.1-Flash (04:13, Hermes lane, early vs its Nov 21 slot) published under a 03 alias with its own crosscheck instrument (7/10 with adapter - a different harness, not comparable to the 8-check neutral or the /100 struct score). Renumbering awaits the operator; both artifacts and story pages stand.
 
 ## Head-to-head: GLM-5.3 vs Qwen3.8-Max (the 72-72 tie)
 

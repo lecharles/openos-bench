@@ -27,3 +27,5 @@ Cross-lane build contract (both lanes): rundir `runs/run-<NN>-<slug>/` under the
 Corroborating evidence: Hermes' independent crosscheck (Nov 19): K3 10/10 vs GLM 8/10 structural - agrees with Tier-1 ordering (80 vs 72).
 
 Freshness scan: `python3 scripts/scan-roster.py` (weekly, Sundays) writes `docs/roster-scans/<date>.md`; the newest scan wins slot decisions.
+
+Numbering reconciliation (Nov 19, two lanes): the official train state has **Qwen3.8-Max fired 03:58 → run-03** (build order wins). The Hermes lane fired DeepSeek-V4.1-Flash at 04:13 (early vs its Nov 21 slot) and published its story under a run-03 alias. Both artifacts stand; the DeepSeek run carries its crosscheck 7/10 in the board below and awaits Tier-1 click path + operator renumber (likely 04 by fire order, replacing the MiniMax slot, or 06 as scheduled). Not resolved silently in either lane's favor - operator note.
