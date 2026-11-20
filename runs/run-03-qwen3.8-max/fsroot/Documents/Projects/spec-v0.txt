@@ -1,0 +1,7 @@
+OpenOS Bench — Fixed Task Spec v0 (frozen 2026-11-19)
+
+Hard requirements: desktop shell, window manager, dock, spotlight,
+finder, 12+ apps, persistence, filesystem allow-list.
+
+Scoring: apps render (E2E), interaction probes (15), persistence,
+security probe, human fidelity pass, cost telemetry.

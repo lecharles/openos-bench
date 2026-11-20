@@ -1,0 +1,14 @@
+Welcome to OpenOS!
+
+This is a macOS-class desktop environment running entirely in your browser.
+
+Things to try:
+  • Press Cmd+Space (or Ctrl+Space) to open Spotlight, type an app name, hit Enter
+  • Drag windows by their title bar, resize from any edge or corner
+  • Right-click desktop icons and files in the Finder
+  • Open Settings to switch between light/dark theme and wallpapers (persisted!)
+  • Move a file to the Trash, then restore it from the Trash app
+  • The Terminal app is a sandboxed shell over this virtual filesystem
+  • Everything you do — windows, notes, settings — survives a page reload
+
+Built with vanilla JS + Express. No frameworks, no bundlers.

@@ -1,0 +1,85 @@
+/* ============ OpenOS window manager chrome ============ */
+#windows-layer { position: absolute; inset: var(--menubar-h) 0 0 0; z-index: 100; pointer-events: none; }
+
+.window {
+  position: absolute; display: flex; flex-direction: column;
+  background: var(--panel); color: var(--fg);
+  border-radius: var(--radius-win);
+  box-shadow: var(--shadow-win-inactive);
+  pointer-events: auto; overflow: hidden;
+  contain: layout;
+  min-width: 220px; min-height: 120px;
+}
+.window.focused { box-shadow: var(--shadow-win); }
+.window.focused .win-title { opacity: 1; }
+
+/* open / close animations */
+.window.opening { animation: winOpen .22s var(--ease-spring); }
+@keyframes winOpen {
+  from { transform: scale(.88); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.window.closing { animation: winClose .17s ease-in forwards; pointer-events: none; }
+@keyframes winClose {
+  to { transform: scale(.9); opacity: 0; }
+}
+.window.genie { transition: transform .42s cubic-bezier(.45,.05,.55,.95), opacity .38s ease-in .06s; pointer-events: none; }
+.window.restoring { transition: transform .3s var(--ease-spring), opacity .2s ease-out; }
+.window.anim-rect { transition: left .22s var(--ease-out), top .22s var(--ease-out), width .22s var(--ease-out), height .22s var(--ease-out); }
+
+/* ---------------- title bar ---------------- */
+.titlebar {
+  height: 38px; flex: none; display: flex; align-items: center;
+  background: var(--titlebar-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: .5px solid var(--border-soft);
+  position: relative; z-index: 3;
+}
+.window:not(.focused) .titlebar { background: var(--panel-2); }
+.traffic-lights { display: flex; gap: 8px; padding: 0 12px; z-index: 4; }
+.tl {
+  width: 12px; height: 12px; border-radius: 50%; position: relative;
+  box-shadow: inset 0 0 0 .5px rgba(0,0,0,.25);
+}
+.tl.close { background: #ff5f57; }
+.tl.min   { background: #febc2e; }
+.tl.max   { background: #28c840; }
+.window:not(.focused) .tl { background: #8f8f94; box-shadow: none; }
+.tl svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+.tl svg path, .tl svg line { stroke: rgba(0,0,0,.55); stroke-width: 1.3; stroke-linecap: round; fill: none; }
+.traffic-lights:hover .tl svg { opacity: 1; }
+.window:not(.focused) .traffic-lights:hover .tl svg { opacity: .35; }
+.tl:active { filter: brightness(.82); }
+
+.win-title {
+  position: absolute; left: 78px; right: 78px; text-align: center;
+  font-size: 13px; font-weight: 600; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  pointer-events: none;
+}
+.win-title .edited { font-weight: 400; opacity: .7; }
+
+/* ---------------- resize handles (8-way) ---------------- */
+.rz { position: absolute; z-index: 6; }
+.rz.n  { top: 0; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.rz.s  { bottom: 0; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.rz.e  { right: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.rz.w  { left: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.rz.ne { top: 0; right: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+.rz.nw { top: 0; left: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+.rz.se { bottom: 0; right: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+.rz.sw { bottom: 0; left: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+
+/* ---------------- window content frame ---------------- */
+.win-content { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; background: var(--panel); }
+.win-content > * { flex: 1; min-height: 0; }
+.window.toolbar-style .win-content { border-top-left-radius: 0; }
+
+/* snap preview */
+#snap-preview {
+  position: absolute; z-index: 6900; border-radius: 12px; display: none;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: all .12s ease-out; pointer-events: none;
+}
+#snap-preview.on { display: block; }

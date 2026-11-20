@@ -8,7 +8,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 |---|---|---|---|---|---|---|---|---|
 | 01 | Kimi K3 (Jul GA) | Moonshot | 2026-07 | baseline | done | 21/21 legacy | 80 | docs/runs/run-01-kimi-k3.md |
 | 02 | GLM-5.3 | Z.ai | Aug 10 | Nov 18 (fired 22:10) | done | 7/8 (88%) | 72 | docs/runs/run-02-glm-5.3.md |
-| 03 | Qwen3.8-Max | Alibaba | Sep 3 | Nov 19 (fired 03:58, in flight) | building | | | |
+| 03 | Qwen3.8-Max | Alibaba | Sep 3 | Nov 19 (fired 03:58, 82 min) | done | 7/8 (88%) | 72 | docs/runs/run-03-qwen3.8-max.md |
 | 04 | MiniMax-M3 | MiniMax | Oct 27 | Nov 19 04:45 (Hermes lane fires) | queued | | | |
 | 05 | **Kimi K3.1** | Moonshot | current refresh - exact tag verified at slot | Nov 20 05:00 | queued | | | |
 | 06 | DeepSeek V4-Flash | DeepSeek | Oct 27 | Nov 21 | queued (unblocked by operator) | | | |
@@ -22,7 +22,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 
 Excluded: GLM-5.3-Vision (tooling mismatch), GLM-Titanium-Preview (too large), Qwen3.8 - no such id, MiniMax-M3-base (no instruct tuning), DeepSeek-R1 (reasoner pre-OS-era) + the retired Nov 18 first-pass model names (superseded by HF re-scan).
 
-Cross-lane build contract (both lanes): rundir `/home/hermes/openos-runs/run-<NN>-<slug>/`, tmux session `openos-run<NN>`, log `run-<NN>-<slug>.log`, state line `<NN> <slug> <rundir>` in `/home/hermes/openos-bench/.train-state`, key id from `/home/hermes/openos-runs/model-ids.map`. One concurrent build at a time; train.sh skips if any `openos-run` session is alive.
+Cross-lane build contract (both lanes): rundir `runs/run-<NN>-<slug>/` under the bench runs root, tmux session `openos-run<NN>`, log `run-<NN>-<slug>.log`, state line `<NN> <slug> <rundir>` in the repo-root `.train-state`, model key id from the runs-root `model-ids.map` (not committed). One concurrent build at a time; the train skips if any `openos-run` session is alive.
 
 Corroborating evidence: Hermes' independent crosscheck (Nov 19): K3 10/10 vs GLM 8/10 structural - agrees with Tier-1 ordering (80 vs 72).
 
