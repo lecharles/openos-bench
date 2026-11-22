@@ -1,14 +1,14 @@
 {
   "url": "http://localhost:31003/",
-  "when": "2026-11-20T16:30:06.719Z",
+  "when": "2026-11-21T16:30:07.893Z",
   "checks": {
     "boot.dom-nodes": {
       "pass": true,
-      "detail": "nodes=876"
+      "detail": "nodes=873"
     },
     "render.non-blank": {
       "pass": true,
-      "detail": "png=748501B bg=rgb(0, 0, 0)"
+      "detail": "png=748116B bg=rgb(0, 0, 0)"
     },
     "shell.menubar-region": {
       "pass": true,
@@ -20,7 +20,7 @@
     },
     "spotlight.overlay-detect": {
       "pass": false,
-      "detail": "frame changed after \u2318-Space"
+      "detail": "frame changed after ⌘-Space"
     },
     "apps.window-opens": {
       "pass": true,
@@ -28,7 +28,7 @@
     },
     "persistence.survives-reload": {
       "pass": true,
-      "detail": "nodes 876->876"
+      "detail": "nodes 873->873"
     },
     "stability.page-errors": {
       "pass": true,
