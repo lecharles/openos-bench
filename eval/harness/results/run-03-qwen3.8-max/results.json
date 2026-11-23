@@ -1,6 +1,6 @@
 {
   "url": "http://localhost:31003/",
-  "when": "2026-11-21T16:30:07.893Z",
+  "when": "2026-11-23T01:02:27.496Z",
   "checks": {
     "boot.dom-nodes": {
       "pass": true,
@@ -8,7 +8,7 @@
     },
     "render.non-blank": {
       "pass": true,
-      "detail": "png=748116B bg=rgb(0, 0, 0)"
+      "detail": "png=748135B bg=rgb(0, 0, 0)"
     },
     "shell.menubar-region": {
       "pass": true,

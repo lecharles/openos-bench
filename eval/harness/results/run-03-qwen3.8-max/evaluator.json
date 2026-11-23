@@ -1,13 +1,13 @@
 {
-  "url": "http://localhost:3103/",
-  "when": "2026-11-20T01:02:01.557Z",
+  "url": "http://localhost:31003/",
+  "when": "2026-11-23T01:02:53.475Z",
   "steps": {
     "1-first-sight": {
-      "dom": 827,
-      "bootMs": 4948,
+      "dom": 862,
+      "bootMs": 4837,
       "shellTop": true,
       "shellBottom": true,
-      "iconCount": 90
+      "iconCount": 108
     },
     "2-app-open": {
       "frameChanged": true
@@ -33,9 +33,9 @@
       "survived": false
     },
     "9-performance": {
-      "bootMs": 4948,
+      "bootMs": 4837,
       "pageErrors": 0,
-      "sampleShotBytes": 775784
+      "sampleShotBytes": 748135
     }
   },
   "axes": {
@@ -53,7 +53,7 @@
     },
     "performance-persistence-15": {
       "score5": 4,
-      "note": "boot 4948ms, errors 0, typed-text survives reload: false"
+      "note": "boot 4837ms, errors 0, typed-text survives reload: false"
     }
   },
   "screenshots": [
