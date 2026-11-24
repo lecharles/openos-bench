@@ -1,10 +1,10 @@
 {
-  "url": "http://localhost:31003/",
-  "when": "2026-11-23T01:02:53.475Z",
+  "url": "http://localhost:3103/",
+  "when": "2026-11-24T01:02:14.746Z",
   "steps": {
     "1-first-sight": {
-      "dom": 862,
-      "bootMs": 4837,
+      "dom": 859,
+      "bootMs": 4839,
       "shellTop": true,
       "shellBottom": true,
       "iconCount": 108
@@ -33,9 +33,9 @@
       "survived": false
     },
     "9-performance": {
-      "bootMs": 4837,
+      "bootMs": 4839,
       "pageErrors": 0,
-      "sampleShotBytes": 748135
+      "sampleShotBytes": 748388
     }
   },
   "axes": {
@@ -53,7 +53,7 @@
     },
     "performance-persistence-15": {
       "score5": 4,
-      "note": "boot 4837ms, errors 0, typed-text survives reload: false"
+      "note": "boot 4839ms, errors 0, typed-text survives reload: false"
     }
   },
   "screenshots": [
