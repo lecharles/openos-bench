@@ -15,12 +15,12 @@ if [ "$action" = "start-next" ]; then
   # skip if a worker session is already alive
   if tmux ls 2>/dev/null | grep -q '^openos-run'; then echo "[train] worker already running, skip"; exit 0; fi
   # parse first queued row from roster: | NN | Model | ... capture run number + model display name
-  line=$(grep -m1 '| queued' "$REPO/eval/model-roster.md" || true)
-  # fallback: scan rows for 'queued' anywhere in status column
-  line=$(awk -F'|' 'NR>4 && $8 ~ /queued/ {print; exit}' "$REPO/eval/model-roster.md")
+  # (Nov 24 fix: Status is field $7 not $8; old code checked the empty Harness col and
+  #  clobbered the grep fallback -> false "roster exhausted" since Nov 19)
+  line=$(awk -F'|' 'NR>4 && $7 ~ /queued/ {print; exit}' "$REPO/eval/model-roster.md")
   [ -z "$line" ] && { echo "[train] roster exhausted - needs human refresh"; exit 0; }
   run=$(echo "$line" | awk -F'|' '{gsub(/ /,"",$2); print $2}')
-  model=$(echo "$line" | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}')
+  model=$(echo "$line" | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}' | tr -d '*')
   # model id slug: keep first token, lowercase
   slug=$(echo "$model" | awk '{print tolower($1)}' | tr -cd 'a-z0-9.-')
   rundir="$LOGDIR/run-$((10#$run))-$slug"
