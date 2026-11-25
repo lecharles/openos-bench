@@ -1,0 +1,52 @@
+{
+  "url": "http://localhost:31005/",
+  "when": "2026-11-25T16:30:07.298Z",
+  "checks": {
+    "boot.dom-nodes": {
+      "pass": true,
+      "detail": "nodes=154"
+    },
+    "render.non-blank": {
+      "pass": true,
+      "detail": "png=590120B bg=rgb(0, 0, 0)"
+    },
+    "shell.menubar-region": {
+      "pass": true,
+      "detail": "candidates=1"
+    },
+    "shell.dock-region": {
+      "pass": true,
+      "detail": "candidates=2"
+    },
+    "spotlight.overlay-detect": {
+      "pass": false,
+      "detail": "frame changed after ⌘-Space"
+    },
+    "apps.window-opens": {
+      "pass": false,
+      "detail": "2/5 unique frames"
+    },
+    "persistence.survives-reload": {
+      "pass": true,
+      "detail": "nodes 154->154"
+    },
+    "stability.page-errors": {
+      "pass": true,
+      "detail": "errors=0"
+    }
+  },
+  "screenshots": [
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/00-boot.png",
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/01-spotlight-attempt.png",
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.35.png",
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.5.png",
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.65.png",
+    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/03-after-reload.png"
+  ],
+  "pageErrors": [],
+  "summary": {
+    "passed": 6,
+    "total": 8,
+    "pct": 75
+  }
+}
