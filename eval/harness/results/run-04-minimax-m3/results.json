@@ -1,0 +1,52 @@
+{
+  "url": "http://localhost:3104/",
+  "when": "2026-11-25T01:01:19.328Z",
+  "checks": {
+    "boot.dom-nodes": {
+      "pass": true,
+      "detail": "nodes=726"
+    },
+    "render.non-blank": {
+      "pass": true,
+      "detail": "png=631037B bg=rgb(11, 11, 14)"
+    },
+    "shell.menubar-region": {
+      "pass": true,
+      "detail": "candidates=1"
+    },
+    "shell.dock-region": {
+      "pass": true,
+      "detail": "candidates=2"
+    },
+    "spotlight.overlay-detect": {
+      "pass": true,
+      "detail": "frame changed after ⌘-Space"
+    },
+    "apps.window-opens": {
+      "pass": true,
+      "detail": "6/6 unique frames"
+    },
+    "persistence.survives-reload": {
+      "pass": true,
+      "detail": "nodes 726->726"
+    },
+    "stability.page-errors": {
+      "pass": true,
+      "detail": "errors=0"
+    }
+  },
+  "screenshots": [
+    "eval/harness/results/run-04-minimax-m3/00-boot.png",
+    "eval/harness/results/run-04-minimax-m3/01-spotlight-attempt.png",
+    "eval/harness/results/run-04-minimax-m3/02-dock-click-0.35.png",
+    "eval/harness/results/run-04-minimax-m3/02-dock-click-0.5.png",
+    "eval/harness/results/run-04-minimax-m3/02-dock-click-0.65.png",
+    "eval/harness/results/run-04-minimax-m3/03-after-reload.png"
+  ],
+  "pageErrors": [],
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pct": 100
+  }
+}

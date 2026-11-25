@@ -9,7 +9,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 | 01 | Kimi K3 (Jul GA) | Moonshot | 2026-07 | baseline | done | 21/21 legacy | 80 | docs/runs/run-01-kimi-k3.md |
 | 02 | GLM-5.3 | Z.ai | Aug 10 | Nov 18 (fired 22:10) | done | 7/8 (88%) | 72 | docs/runs/run-02-glm-5.3.md |
 | 03 | Qwen3.8-Max | Alibaba | Sep 3 | Nov 19 (fired 03:58, 82 min) | done | 7/8 (88%) | 72 | docs/runs/run-03-qwen3.8-max.md |
-| 04 | MiniMax-M3 | MiniMax | Oct 27 | Nov 19 04:45 (Hermes lane fires) | queued | | | |
+| 04 | MiniMax-M3 | MiniMax | Oct 27 | fired Nov 24 07:13, done ~08:18 (~65 min) | done | 8/8 (100%) | 100 (prov.) | docs/runs/run-04-minimax-m3.md |
 | 05 | **Kimi K3.1** | Moonshot | current refresh - exact tag verified at slot | Nov 20 05:00 | queued | | | |
 | 06 | DeepSeek V4-Flash | DeepSeek | Oct 27 | Nov 21 | queued (unblocked by operator) | | | |
 | 07 | MiMo v2.6-Pro | Xiaomi | Sep 27 | Nov 22 | queued | | | |

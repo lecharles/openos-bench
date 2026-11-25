@@ -75,14 +75,15 @@ node server.js            # serves the desktop (default port 3080)
 | 01  | Kimi K3    | 2026-07| 21/21     | 15/15       | ✅      | 84/100 (operator, provisional) | baseline; 16/16 hard reqs |
 | 02  | GLM-5.3    | 2026-11| 21/21*    | 16 apps     | ✅      | 75/100 (agent prov.) | neutral harness 7/8 (88%); walkthrough can override |
 | 03  | Qwen3.8-Max| 2026-11| 50/50*    | 15+3 apps   | ✅      | not yet walked | struct 72/100 (struct); neutral harness 7/8 (88%); no Launchpad - the one real structural loss |
+| 04  | MiniMax-M3 | 2026-11| 17 apps   | 28/28*      | ✅      | not yet walked | struct **100/100 (struct, provisional)**; neutral harness **8/8 (100%)** - first clean sweep; 1 × ~65 min |
 
-Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md) · Run-03 story: [docs/runs/run-03-qwen3.8-max.md](docs/runs/run-03-qwen3.8-max.md) · Rolling leaderboard: [docs/comparisons/run-03-rolling-leaderboard.md](docs/comparisons/run-03-rolling-leaderboard.md)
+Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md) · Run-03 story: [docs/runs/run-03-qwen3.8-max.md](docs/runs/run-03-qwen3.8-max.md) · Run-04 story: [docs/runs/run-04-minimax-m3.md](docs/runs/run-04-minimax-m3.md) · Rolling leaderboard: [docs/comparisons/run-04-rolling-leaderboard.md](docs/comparisons/run-04-rolling-leaderboard.md)
 
 *Nov 19 numbering note: two lanes both fired at run-03 - train state (Qwen 03:58) owns the official number; the DeepSeek-V4.1-Flash early run keeps a 03 alias pending operator renumber. See [eval/model-roster.md](eval/model-roster.md).*
 
 Grading rubric: [docs/HUMAN_EVAL_RUBRIC.md](docs/HUMAN_EVAL_RUBRIC.md) · Demo & human-pass click path: [docs/DEMO.md](docs/DEMO.md)
 
-The bench fills nightly: GLM-5.3 (done, run-02), Qwen3.8-Max (done, run-03), MiniMax-M3, MiMo-v2.5-Pro, Kimi-K2.7-Code, LongCat-2.0, Hunyuan hy4-preview, plus December wildcards. Full schedule and scoring plan in [ROADMAP.md](ROADMAP.md).
+The bench fills nightly: GLM-5.3 (done, run-02), Qwen3.8-Max (done, run-03), MiniMax-M3 (done, run-04), MiMo-v2.5-Pro, Kimi-K2.7-Code, LongCat-2.0, Hunyuan hy4-preview, plus December wildcards. Full schedule and scoring plan in [ROADMAP.md](ROADMAP.md).
 
 ## License
 
