@@ -19,7 +19,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 | 10 | Hunyuan hy4-preview | Tencent | verify at slot | Nov 25 | queued | | | |
 | 11 | Qwen3.8-27B | Alibaba | Aug 5 (~6.9M DLs) | Nov 26 | queued | | | |
 | 12 | omen-alpha | (key listing) | Nov wildcard | Nov 27 | queued | | | |
-| 13+ | wildcards: qwen4-max, step-5-preview, Nemotron-550B (availability check), Dec drops | various | rolling | daily | queued | | | |
+| 13+ | wildcards: qwen4-max, step-5-preview, Nemotron-550B (availability check), **GLM-5.4 (released Nov 23 - CLOSED: Coding Plan/ZChat only, no API/open weights yet; bench-ready the moment it hits the key listing or zai-org drops weights)**, Dec drops | various | rolling | daily | queued (GLM-5.4 = watch) | | | |
 
 Excluded: GLM-5.3-Vision (tooling mismatch), GLM-Titanium-Preview (too large), Qwen3.8 - no such id, MiniMax-M3-base (no instruct tuning), DeepSeek-R1 (reasoner pre-OS-era) + the retired Nov 18 first-pass model names (superseded by HF re-scan).
 
