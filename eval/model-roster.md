@@ -10,10 +10,10 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 | 02 | GLM-5.3 | Z.ai | Aug 10 | Nov 18 (fired 22:10) | done | 7/8 (88%) | 72 | docs/runs/run-02-glm-5.3.md |
 | 03 | Qwen3.8-Max | Alibaba | Sep 3 | Nov 19 (fired 03:58, 82 min) | done | 7/8 (88%) | 72 | docs/runs/run-03-qwen3.8-max.md |
 | 04 | MiniMax-M3 | MiniMax | Oct 27 | fired Nov 24 07:13, done ~08:18 (~65 min) | done | 8/8 (100%) | 100 (prov.) | docs/runs/run-04-minimax-m3.md |
-| 05 | **Kimi K3.1** | Moonshot | current refresh - exact tag verified at slot | Nov 20 05:00 | queued | | | |
+| 05 | **Kimi K3.1** | Moonshot | current refresh - exact tag verified at slot | Nov 20 05:00 | queued (rerun - Nov 25 slot misfire built K2.7-Code instead; train.sh map-grep fixed) | | | |
 | 06 | DeepSeek V4-Flash | DeepSeek | Oct 27 | Nov 21 | queued (unblocked by operator) | | | |
 | 07 | MiMo v2.6-Pro | Xiaomi | Sep 27 | Nov 22 | queued | | | |
-| 08 | Kimi-K2.7-Code | Moonshot | Jun 11 (pre-K3 specialist control) | Nov 23 | queued | | | |
+| 08 | Kimi-K2.7-Code | Moonshot | Jun 11 (pre-K3 specialist control) | Nov 25 05:00 slot (misfire, fired early - see run-08 story) | done | 7/8 (88%) | 64 (prov.) | docs/runs/run-08-kimi-k2.7-code.md |
 | 09 | LongCat-2.0 | Meituan | verify at slot (HF listing unconfirmed) | Nov 24 | queued (slot-time check) | | | |
 | 10 | Hunyuan hy4-preview | Tencent | verify at slot | Nov 25 | queued | | | |
 | 11 | Qwen3.8-27B | Alibaba | Aug 5 (~6.9M DLs) | Nov 26 | queued | | | |

@@ -1,6 +1,6 @@
 {
-  "url": "http://localhost:31005/",
-  "when": "2026-11-25T16:30:07.298Z",
+  "url": "http://localhost:3105/",
+  "when": "2026-11-26T01:02:22.034Z",
   "checks": {
     "boot.dom-nodes": {
       "pass": true,
@@ -8,7 +8,7 @@
     },
     "render.non-blank": {
       "pass": true,
-      "detail": "png=590120B bg=rgb(0, 0, 0)"
+      "detail": "png=589848B bg=rgb(0, 0, 0)"
     },
     "shell.menubar-region": {
       "pass": true,
@@ -23,8 +23,8 @@
       "detail": "frame changed after ⌘-Space"
     },
     "apps.window-opens": {
-      "pass": false,
-      "detail": "2/5 unique frames"
+      "pass": true,
+      "detail": "3/6 unique frames"
     },
     "persistence.survives-reload": {
       "pass": true,
@@ -36,17 +36,17 @@
     }
   },
   "screenshots": [
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/00-boot.png",
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/01-spotlight-attempt.png",
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.35.png",
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.5.png",
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/02-dock-click-0.65.png",
-    "/home/hermes/openos-bench/eval/harness/results/run-05-kimi/03-after-reload.png"
+    "eval/harness/results/run-05-kimi/00-boot.png",
+    "eval/harness/results/run-05-kimi/01-spotlight-attempt.png",
+    "eval/harness/results/run-05-kimi/02-dock-click-0.35.png",
+    "eval/harness/results/run-05-kimi/02-dock-click-0.5.png",
+    "eval/harness/results/run-05-kimi/02-dock-click-0.65.png",
+    "eval/harness/results/run-05-kimi/03-after-reload.png"
   ],
   "pageErrors": [],
   "summary": {
-    "passed": 6,
+    "passed": 7,
     "total": 8,
-    "pct": 75
+    "pct": 88
   }
 }

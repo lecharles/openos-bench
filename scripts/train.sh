@@ -24,8 +24,16 @@ if [ "$action" = "start-next" ]; then
   # model id slug: keep first token, lowercase
   slug=$(echo "$model" | awk '{print tolower($1)}' | tr -cd 'a-z0-9.-')
   rundir="$LOGDIR/run-$((10#$run))-$slug"
-  keyid="$(grep -m1 "^${model% *}" "$LOGDIR/model-ids.map" 2>/dev/null | cut -d= -f2-)"
-  keyid="${keyid:-opencode-go/$slug}"
+  # Nov 25 fix: unanchored prefix grep built run-05 with the WRONG model:
+  # "Kimi K3.1" -> "^Kimi" matched Kimi-K2.7-Code (map order) before Kimi.
+  # Exact match first, then first-token match ANCHORED ON "=", else abort.
+  keyid="$(grep -m1 "^${model}=" "$LOGDIR/model-ids.map" 2>/dev/null | cut -d= -f2-)"
+  [ -z "$keyid" ] && keyid="$(grep -m1 "^${model% *}=" "$LOGDIR/model-ids.map" 2>/dev/null | cut -d= -f2-)"
+  if [ -z "$keyid" ]; then
+    amb=$(grep -c "^${model% *}=" "$LOGDIR/model-ids.map" 2>/dev/null || echo 0)
+    [ "$amb" -gt 1 ] && { echo "[train] AMBIGUOUS map keys for '$model' - refusing to guess"; exit 1; }
+    keyid="opencode-go/$slug"
+  fi
   echo "[train] starting run $run ($model) -> $rundir"
   tmux new-session -d -s "openos-run$run" "bash $REPO/run-worker.sh '$keyid' '$rundir' 2>&1 | tee $LOGDIR/run-$run-$slug.log"
   echo "$run $slug $rundir" > "$STATE"
