@@ -1,0 +1,219 @@
+{
+  "settings": {
+    "theme": "light",
+    "wallpaper": "aurora",
+    "accent": "blue",
+    "reduceMotion": false,
+    "dockSize": 58,
+    "showHidden": false
+  },
+  "windows": {
+    "finder": {
+      "x": 325,
+      "y": 180,
+      "width": 860,
+      "height": 560,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "calendar": {
+      "x": 339,
+      "y": 168,
+      "width": 880,
+      "height": 610,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "contacts": {
+      "x": 423,
+      "y": 226,
+      "width": 760,
+      "height": 520,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "textedit": {
+      "x": 437,
+      "y": 215,
+      "width": 780,
+      "height": 570,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "calculator": {
+      "x": 611,
+      "y": 243,
+      "width": 320,
+      "height": 440,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "clock": {
+      "x": 505,
+      "y": 241,
+      "width": 580,
+      "height": 470,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "mail": {
+      "x": 354,
+      "y": 204,
+      "width": 930,
+      "height": 570,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "music": {
+      "x": 275,
+      "y": 120,
+      "width": 800,
+      "height": 580,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "notes": {
+      "x": 444,
+      "y": 253,
+      "width": 790,
+      "height": 520,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "photos": {
+      "x": 313,
+      "y": 156,
+      "width": 820,
+      "height": 560,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "settings": {
+      "x": 357,
+      "y": 160,
+      "width": 780,
+      "height": 580,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "terminal": {
+      "x": 421,
+      "y": 238,
+      "width": 700,
+      "height": 450,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "trash": {
+      "x": 470,
+      "y": 256,
+      "width": 650,
+      "height": 440,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    },
+    "weather": {
+      "x": 569,
+      "y": 164,
+      "width": 500,
+      "height": 650,
+      "open": true,
+      "minimized": false,
+      "maximized": false
+    }
+  },
+  "notes": [
+    {
+      "id": "welcome",
+      "title": "Welcome to Notes",
+      "body": "A quiet place for your thoughts.\n\nYour notes are saved automatically on the server.",
+      "updatedAt": "2026-11-26T17:36:46.415Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "design-review",
+      "date": "2026-11-27",
+      "time": "10:00",
+      "title": "Design review",
+      "color": "blue"
+    },
+    {
+      "id": "lunch",
+      "date": "2026-11-29",
+      "time": "12:30",
+      "title": "Lunch with Maya",
+      "color": "green"
+    },
+    {
+      "id": "focus",
+      "date": "2026-12-03",
+      "time": "09:00",
+      "title": "Focus time",
+      "color": "purple"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "maya",
+      "name": "Maya Chen",
+      "company": "Northstar Studio",
+      "email": "maya@northstar.example",
+      "phone": "(415) 555-0138",
+      "notes": "Product designer. Loves good coffee and clear systems."
+    },
+    {
+      "id": "alex",
+      "name": "Alex Morgan",
+      "company": "OpenOS",
+      "email": "alex@openos.local",
+      "phone": "(415) 555-0184",
+      "notes": "Engineering · San Francisco"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia Rivera",
+      "company": "Field Notes",
+      "email": "sofia@fieldnotes.example",
+      "phone": "(510) 555-0162",
+      "notes": "Writer and photographer."
+    },
+    {
+      "id": "james",
+      "name": "James Wilson",
+      "company": "Independent",
+      "email": "james@example.com",
+      "phone": "(628) 555-0119",
+      "notes": "Met at the design systems meetup."
+    },
+    {
+      "id": "nina",
+      "name": "Nina Park",
+      "company": "Daylight Labs",
+      "email": "nina@daylight.example",
+      "phone": "(650) 555-0197",
+      "notes": "Research and prototyping."
+    }
+  ],
+  "preferences": {
+    "mailSent": [],
+    "mailRead": [
+      "m1"
+    ],
+    "favoritePhotos": []
+  },
+  "version": 1
+}

@@ -1,0 +1,52 @@
+{
+  "url": "http://local-port",
+  "when": "2026-11-26T17:39:34.912Z",
+  "checks": {
+    "boot.dom-nodes": {
+      "pass": true,
+      "detail": "nodes=1834"
+    },
+    "render.non-blank": {
+      "pass": true,
+      "detail": "png=263920B bg=rgb(12, 12, 14)"
+    },
+    "shell.menubar-region": {
+      "pass": true,
+      "detail": "candidates=1"
+    },
+    "shell.dock-region": {
+      "pass": true,
+      "detail": "candidates=2"
+    },
+    "spotlight.overlay-detect": {
+      "pass": true,
+      "detail": "frame=false dom-overlay=true focused-search=true"
+    },
+    "apps.window-opens": {
+      "pass": true,
+      "detail": "4/5 unique frames"
+    },
+    "persistence.survives-reload": {
+      "pass": true,
+      "detail": "nodes 1834->1834"
+    },
+    "stability.page-errors": {
+      "pass": true,
+      "detail": "errors=0"
+    }
+  },
+  "screenshots": [
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/00-boot.png",
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/01-spotlight-attempt.png",
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/02-dock-click-0.35.png",
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/02-dock-click-0.5.png",
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/02-dock-click-0.65.png",
+    "eval/harness/results/run-06-deepseek-v4.1-flash/harnessjs/03-after-reload.png"
+  ],
+  "pageErrors": [],
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pct": 100
+  }
+}

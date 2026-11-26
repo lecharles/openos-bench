@@ -77,10 +77,12 @@ node server.js            # serves the desktop (default port 3080)
 | 03  | Qwen3.8-Max| 2026-11| 50/50*    | 15+3 apps   | ✅      | not yet walked | struct 72/100 (struct); neutral harness 7/8 (88%); no Launchpad - the one real structural loss |
 | 04  | MiniMax-M3 | 2026-11| 17 apps   | 28/28*      | ✅      | not yet walked | struct **100/100 (struct, provisional)**; neutral harness **8/8 (100%)** - first clean sweep; 1 × ~65 min |
 | 08  | Kimi-K2.7-Code | 2026-11| 15 apps*  | 4/9 click-steps red | layout-only | not yet walked | struct 64/100 (struct, provisional); neutral harness 7/8 (88%); pre-K3 control; fired on K3.1's slot via map-grep bug (fixed), 1 × ~16 min |
+| 05  | **Kimi K3.1** | 2026-11| 12/13 dock-click + 14 apps self | spotlight/launchpad/menu green, drag probe red | layout-only | not yet walked | struct **88/100 (struct, provisional)**; neutral harness **8/8 (100%)** - clears K3 baseline in one session; 1 × ~70 min |
+| 06  | DeepSeek-V4.1-Flash | 2026-11| apps open, thin depth | 3 interaction reds (spotlight/launch/launchpad) | layout-only | not yet walked | struct 72/100 (struct, provisional); neutral harness 8/8 (100%) - widest harness-vs-clickpath split on board; 1 × ~72 min |
 
-Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md) · Run-03 story: [docs/runs/run-03-qwen3.8-max.md](docs/runs/run-03-qwen3.8-max.md) · Run-04 story: [docs/runs/run-04-minimax-m3.md](docs/runs/run-04-minimax-m3.md) · Run-08 story: [docs/runs/run-08-kimi-k2.7-code.md](docs/runs/run-08-kimi-k2.7-code.md) · Rolling leaderboard: [docs/comparisons/run-08-rolling-leaderboard.md](docs/comparisons/run-08-rolling-leaderboard.md)
+Run-02 story: [docs/runs/run-02-glm-5.3.md](docs/runs/run-02-glm-5.3.md) · Run-03 story: [docs/runs/run-03-qwen3.8-max.md](docs/runs/run-03-qwen3.8-max.md) · Run-04 story: [docs/runs/run-04-minimax-m3.md](docs/runs/run-04-minimax-m3.md) · Run-05 story: [docs/runs/run-05-kimi-k3.1.md](docs/runs/run-05-kimi-k3.1.md) · Run-06 story: [docs/runs/run-06-deepseek-v4.1-flash.md](docs/runs/run-06-deepseek-v4.1-flash.md) · Run-08 story: [docs/runs/run-08-kimi-k2.7-code.md](docs/runs/run-08-kimi-k2.7-code.md) · Rolling leaderboard: [docs/comparisons/run-06-rolling-leaderboard.md](docs/comparisons/run-06-rolling-leaderboard.md)
 
-*Nov 19 numbering note: two lanes both fired at run-03 - train state (Qwen 03:58) owns the official number; the DeepSeek-V4.1-Flash early run keeps a 03 alias pending operator renumber. See [eval/model-roster.md](eval/model-roster.md).*
+*Nov 19 numbering note (resolved 11-26 by operator): train-state Qwen owns run-03; the DeepSeek-V4.1-Flash early run was renumbered to run 06 and published. Prior rolling boards: [run-08](docs/comparisons/run-08-rolling-leaderboard.md).*
 
 Grading rubric: [docs/HUMAN_EVAL_RUBRIC.md](docs/HUMAN_EVAL_RUBRIC.md) · Demo & human-pass click path: [docs/DEMO.md](docs/DEMO.md)
 

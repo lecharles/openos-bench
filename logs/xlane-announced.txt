@@ -1,0 +1,5 @@
+run-01-kimi-k3
+run-02-glm-5.3
+run-03-qwen3.8-max
+run-04-minimax-m3
+run-08-kimi-k2.7-code

@@ -1,0 +1,12 @@
+Welcome to OpenOS
+
+This is your personal workspace. Everything you create here lives on the server.
+
+Try these things:
+• Open Notes and write something.
+• Press ⌘ Space to find an app.
+• Drag windows by their title bar and resize from any edge.
+• Move a file to Trash, then restore it.
+• Make the desktop yours in Settings.
+
+Have a wonderful day.

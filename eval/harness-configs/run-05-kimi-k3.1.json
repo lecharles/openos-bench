@@ -1,0 +1,7 @@
+{
+  "app": "[data-app=\"{app_l}\"], [title=\"{app}\"], [aria-label=\"{app}\"]",
+  "close": "[aria-label^=\"Close \"]",
+  "maximize": "[aria-label^=\"Maximize\"], [aria-label=\"Zoom\"]",
+  "restore": "[aria-label^=\"Restore\"]",
+  "windows": "section.window"
+}
