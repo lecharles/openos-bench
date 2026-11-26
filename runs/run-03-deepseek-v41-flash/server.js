@@ -458,8 +458,8 @@ try {
   console.warn('socket.io not available:', err.message);
 }
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`OpenOS v${VERSION} — serving on http://0.0.0.0:${PORT}`);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`OpenOS v${VERSION} — serving on http://127.0.0.1:${PORT}`);
   console.log('FS allow-list roots:');
   for (const r of ALLOWED_REAL) console.log('  ✓', r);
   console.log('Home folder:', USER);

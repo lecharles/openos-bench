@@ -57,15 +57,32 @@ const w = ms => new Promise(r => setTimeout(r, ms));
   const s3 = await shot(page, 'step03-after-drag.png');
   report.steps['3-drag'] = { measurable: before !== null, moved: before !== null ? Math.abs((after || before) - before) > 20 : report.steps['2-app-open'].frameChanged };
 
-  // 4: spotlight attempt (both chords) + type + screenshot
+  // 4: spotlight attempt (both chords) + DOM-aware typing (instrument v2)
   await page.keyboard.down('Control'); await page.keyboard.press('Space'); await page.keyboard.up('Control');
   await page.keyboard.down('Meta'); await page.keyboard.press('Space'); await page.keyboard.up('Meta');
   await w(700);
-  await page.keyboard.type('not', { delay: 70 });
+  const spotDom = await page.evaluate(() => {
+    const vis = e => { const r = e.getBoundingClientRect(); return r.width > 40 && r.height > 8; };
+    const ov = Array.from(document.querySelectorAll('[id*=spot], [class*=spot], [role=dialog]')).filter(vis)[0] || null;
+    const input = ov ? ov.querySelector('input, textarea, [contenteditable]') : null;
+    if (input && document.activeElement !== input) input.focus(); // user-equivalent: the field is visible, click/focus is fair
+    return { overlay: !!ov, focusedSearch: document.activeElement === input };
+  });
+  // type char-by-char so the app's own search-input handler fires (page.keyboard.type can miss custom listeners)
+  if (spotDom.focusedSearch) {
+    await page.evaluate(() => {
+      const inp = document.activeElement;
+      if (inp && 'value' in inp) { inp.value = ''; }
+    });
+    for (const ch of 'not') { await page.keyboard.type(ch, { delay: 90 }); }
+  } else {
+    await page.keyboard.type('not', { delay: 70 });
+  }
   const s4 = await shot(page, 'step04-spotlight.png');
-  report.steps['5-spotlight'] = { frameChanged: diff(s3, s4) };
+  report.steps['5-spotlight'] = { frameChanged: diff(s3, s4), domOverlay: spotDom.overlay, focusedSearch: spotDom.focusedSearch };
 
-  // 5: launch via Enter
+  // 5: launch via Enter (ArrowDown first - many Spotlight UIs require explicit result selection)
+  await page.keyboard.press('ArrowDown'); await w(400);
   await page.keyboard.press('Enter'); await w(1500);
   const s5 = await shot(page, 'step05-launched.png');
   report.steps['6-spotlight-launch'] = { frameChanged: diff(s4, s5) };
@@ -83,18 +100,43 @@ const w = ms => new Promise(r => setTimeout(r, ms));
   report.steps['7-context-menu'] = { frameChanged: diff(s6, s7) };
   await page.keyboard.press('Escape');
 
-  // 8: persistence - type into first textarea anywhere, reload, check survives
-  const typed = await page.evaluate(() => {
-    const t = document.querySelector('textarea, [contenteditable="true"], input[type=text]');
-    if (!t) return false;
-    t.focus(); t.value = 'BENCH-PERSIST-7x9k'; t.dispatchEvent(new Event('input', { bubbles: true }));
-    return true;
+  // 8: persistence (instrument v2) - find an app with a content editor (Notes-like),
+  // type a mark, reload, check it survived. Center-dock hits search apps (Finder/Mail);
+  // this probe iterates dock slots and only targets textarea/contenteditable, never search inputs.
+  let typed = false, typedFrac = null, typedXY = null;
+  const iconXY = await page.evaluate(() => {
+    // generic: every icon-sized clickable living in the bottom shell strip, left to right
+    const r = e => e.getBoundingClientRect();
+    return Array.from(document.querySelectorAll('body *'))
+      .filter(e => { const b = r(e); return b.width >= 24 && b.width <= 96 && b.height >= 24 && b.height <= 96 && Math.abs(b.bottom - innerHeight) < 110 && b.top > innerHeight * 0.8 && e.closest('[id*=dock],[class*=dock]'); })
+      .map(e => { const b = r(e); return { x: Math.round(b.left + b.width / 2), y: Math.round(b.top + b.height / 2) }; })
+      .filter((p, i, a) => a.findIndex(q => q.x === p.x && q.y === p.y) === i);
   });
+  for (const { x, y } of iconXY) {
+    if (typed) break;
+    await page.keyboard.press('Escape'); await w(300);
+    await page.mouse.click(x, y); await w(1600);
+    typedXY = [x, y];
+    typed = await page.evaluate(() => {
+      const MARK = 'BENCH-PERSIST-7x9k';
+      const vis = x => { const r = x.getBoundingClientRect(); return r.width > 40 && r.height > 20 && getComputedStyle(x).visibility !== 'hidden'; };
+      const t = Array.from(document.querySelectorAll('textarea, [contenteditable="true"]'))
+        .filter(e => !e.closest('[id*=spot],[class*=spot]') && vis(e))[0];
+      if (!t) return false;
+      t.focus();
+      if ('value' in t && t.tagName === 'TEXTAREA') { t.value = MARK; } else { t.textContent = MARK; }
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+      t.dispatchEvent(new Event('change', { bubbles: true }));
+      return true;
+    });
+  }
   await w(1200);
   await page.reload({ waitUntil: 'networkidle2' }); await w(3500);
+  if (typed) { await page.mouse.click(typedXY[0], typedXY[1]); await w(1600); }
   const survived = await page.evaluate(() => {
-    const all = Array.from(document.querySelectorAll('textarea, input, [class*=note], [id*=note]')).map(e => (e.value || '') + ' ' + (e.textContent || ''));
-    return all.some(v => v.includes('BENCH-PERSIST-7x9k'));
+    const hay = Array.from(document.querySelectorAll('textarea, input, [contenteditable], [class*=note], [id*=note], .window, [class*=window]'))
+      .map(e => (e.value || '') + ' ' + (e.textContent || ''));
+    return hay.some(v => v.includes('BENCH-PERSIST-7x9k'));
   });
   const s8 = await shot(page, 'step08-after-reload.png');
   report.steps['8-persistence'] = { typed, survived };

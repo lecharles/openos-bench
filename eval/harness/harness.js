@@ -63,17 +63,27 @@ function uniquePngs(dir) {
   rec('shell.menubar-region', geo.top > 0, `candidates=${geo.top}`);
   rec('shell.dock-region', geo.bottom > 0, `candidates=${geo.bottom}`);
 
-  // C4 spotlight: ⌘-Space then ctrl+space fallback; frame must change
+  // C4 spotlight (instrument v2): ⌘-Space then ctrl+space; DOM-based overlay detection
+  // replaces the pixel-diff-only probe - headless frame diffs missed working overlays.
   const before = fs.statSync(shot0).size;
   await page.keyboard.down('Control'); await page.keyboard.press('Space'); await page.keyboard.up('Control');
   await page.keyboard.down('Meta'); await page.keyboard.press('Space'); await page.keyboard.up('Meta');
   await new Promise(r => setTimeout(r, 500));
-  await page.type('body', 'no', { delay: 60 }); // any keystroke lands in whatever overlay opened
+  const spotDom = await page.evaluate(() => {
+    const vis = e => { const r = e.getBoundingClientRect(); return r.width > 40 && r.height > 8; };
+    const overlay = Array.from(document.querySelectorAll('[id*=spot], [class*=spot], [role=dialog]')).some(vis);
+    const focused = !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+    return { overlay, focused };
+  });
+  if (spotDom.focused) await page.keyboard.type('no', { delay: 60 });
+  else await page.type('body', 'no', { delay: 60 });
   await new Promise(r => setTimeout(r, 1200));
   const shotS = path.join(out, '01-spotlight-attempt.png');
   await page.screenshot({ path: shotS });
   const spot = uniquePngs(out);
-  rec('spotlight.overlay-detect', spot.unique > spot.count - 1 && fs.statSync(shotS).size !== before, 'frame changed after ⌘-Space');
+  const frameOK = spot.unique > spot.count - 1 && fs.statSync(shotS).size !== before;
+  rec('spotlight.overlay-detect', frameOK || spotDom.overlay || spotDom.focused,
+    `frame=${frameOK} dom-overlay=${spotDom.overlay} focused-search=${spotDom.focused}`);
   results.screenshots.push(shotS);
   await page.keyboard.press('Escape');
 

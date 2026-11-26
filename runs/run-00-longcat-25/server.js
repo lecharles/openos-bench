@@ -112,8 +112,8 @@ io.on('connection', (socket) => {
   socket.on('ping', (cb) => { if (typeof cb === 'function') cb({ ok: true }); });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`OpenOS 1.0 serving on http://0.0.0.0:${PORT} (home=${OS_HOME})`);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`OpenOS 1.0 serving on http://127.0.0.1:${PORT} (home=${OS_HOME})`);
 });
 
 process.on('SIGTERM', () => server.close(() => process.exit(0)));
