@@ -11,7 +11,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 | 03 | Qwen3.8-Max | Alibaba | Sep 3 | Nov 19 (fired 03:58, 82 min) | done | 7/8 (88%) | 72 | docs/runs/run-03-qwen3.8-max.md |
 | 04 | MiniMax-M3 | MiniMax | Oct 27 | fired Nov 24 07:13, done ~08:18 (~65 min) | done | 8/8 (100%) | 100 (prov.) | docs/runs/run-04-minimax-m3.md |
 | 05 | **Kimi K3.1** | Moonshot | current refresh - exact tag verified at slot | Nov 20 05:00 | queued (rerun - Nov 25 slot misfire built K2.7-Code instead; train.sh map-grep fixed) | | | |
-| 05+ | **GLM-5.4** | Z.ai | Nov 23 (GLM Coding Plan + Z.ai Chat/ZCode rollout; pay-as-you-go API "soon" pending security assessment; open weights unreleased - per operator screenshot 11-25) | Nov 27 07:05 PT | queued (operator priority, 11-25; provisional number - build order wins at fire) | | | |
+| 05+ | **GLM-5.4** | Z.ai | Nov 23 (GLM Coding Plan + Z.ai Chat/ZCode rollout; pay-as-you-go API "soon" pending security assessment; open weights unreleased - per operator screenshot 11-25) | Nov 27 07:05 PT | queued (operator priority, 11-25; probe Nov 25 19:00 PT: opencode-go/glm-5.4 returns 5xx - id NOT live on key yet; if still dead at fire time mark blocked, do not burn the slot on a failing build) | | | |
 | 06 | DeepSeek V4-Flash | DeepSeek | Oct 27 | Nov 21 | queued (unblocked by operator) | | | |
 | 07 | MiMo v2.6-Pro | Xiaomi | Sep 27 | Nov 22 | queued | | | |
 | 08 | Kimi-K2.7-Code | Moonshot | Jun 11 (pre-K3 specialist control) | Nov 25 05:00 slot (misfire, fired early - see run-08 story) | done | 7/8 (88%) | 64 (prov.) | docs/runs/run-08-kimi-k2.7-code.md |
@@ -19,7 +19,7 @@ One row per model, run # = build order. Status: `done` / `building` / `queued` /
 | 10 | Hunyuan hy4-preview | Tencent | verify at slot | Nov 25 | queued | | | |
 | 11 | Qwen3.8-27B | Alibaba | Aug 5 (~6.9M DLs) | Nov 26 | queued | | | |
 | 12 | omen-alpha | (key listing) | Nov wildcard | Nov 27 | queued | | | |
-| 13+ | wildcards: qwen4-max, step-5-preview, Nemotron-550B (availability check), **GLM-5.4 (released Nov 23 - CLOSED: Coding Plan/ZChat only, no API/open weights yet; bench-ready the moment it hits the key listing or zai-org drops weights)**, Dec drops | various | rolling | daily | queued (GLM-5.4 = watch) | | | |
+| 13+ | wildcards: qwen4-max, step-5-preview, Nemotron-550B (availability check), Dec drops | various | rolling | daily | queued | | | |
 
 Excluded: GLM-5.3-Vision (tooling mismatch), GLM-Titanium-Preview (too large), Qwen3.8 - no such id, MiniMax-M3-base (no instruct tuning), DeepSeek-R1 (reasoner pre-OS-era) + the retired Nov 18 first-pass model names (superseded by HF re-scan).
 
