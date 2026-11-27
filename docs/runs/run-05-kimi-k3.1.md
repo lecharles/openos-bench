@@ -17,6 +17,8 @@
 | Apps | 12/13 dock apps open windows via click; STATUS.md claims 14 apps + Finder, all render | T1 |
 | Human/operator pass | not yet walked | T3 pending |
 
+**Publish-cron independent confirmation (Nov 27, 17:04 PT):** both Tier-1 instruments re-run fresh on a loopback boot of the same rundir (port 3105) - neutral harness **8/8 (100%)** and click-path **88/100 (struct, prov.)**, matching the published numbers exactly; reds reproduced identically (drag `moved: false`, typed-text `survived: false`; boot 4,758 ms / 916 nodes). No score change, kept as a repeatability datapoint per the diff-note rule.
+
 ## Lineage verdict - the hypothesis this slot existed to test
 
 Run-05 was queued to answer one question: *does the K2.7 → K3 → K3.1 lineage improve per-session, or was K3's 80 just three overnight sessions of scope?*
