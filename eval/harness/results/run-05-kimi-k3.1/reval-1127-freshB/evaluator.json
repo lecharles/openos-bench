@@ -1,0 +1,76 @@
+{
+  "url": "http://127.0.0.1:3105/",
+  "when": "2026-11-28T01:07:34.271Z",
+  "steps": {
+    "1-first-sight": {
+      "dom": 736,
+      "bootMs": 4725,
+      "shellTop": true,
+      "shellBottom": true,
+      "iconCount": 113
+    },
+    "2-app-open": {
+      "frameChanged": true
+    },
+    "3-drag": {
+      "measurable": true,
+      "moved": false
+    },
+    "5-spotlight": {
+      "frameChanged": true,
+      "domOverlay": true,
+      "focusedSearch": true
+    },
+    "6-spotlight-launch": {
+      "frameChanged": false
+    },
+    "4-launchpad": {
+      "frameChanged": true
+    },
+    "7-context-menu": {
+      "frameChanged": true
+    },
+    "8-persistence": {
+      "typed": true,
+      "survived": true
+    },
+    "9-performance": {
+      "bootMs": 4725,
+      "pageErrors": 0,
+      "sampleShotBytes": 993010
+    }
+  },
+  "axes": {
+    "visual-fidelity-30": {
+      "score5": 5,
+      "note": "shell regions + overlay/menu/launchpad response frames; texture/blur/animation feel requires vision tier"
+    },
+    "app-functionality-30": {
+      "score5": 3,
+      "note": "app-open, drag response, spotlight launch"
+    },
+    "agent-vps-apps-25": {
+      "score5": 0,
+      "note": "not measurable structurally - vision tier / operator"
+    },
+    "performance-persistence-15": {
+      "score5": 5,
+      "note": "boot 4725ms, errors 0, typed-text survives reload: true"
+    }
+  },
+  "screenshots": [
+    "step01-boot.png",
+    "step02-app-open.png",
+    "step03-after-drag.png",
+    "step04-spotlight.png",
+    "step05-launched.png",
+    "step06-launchpad.png",
+    "step07-context-menu.png",
+    "step08-after-reload.png"
+  ],
+  "provisionalScore100": {
+    "value": 84,
+    "basis": "75pt measurable axes x20/15 structural signal",
+    "excludes": "agent/VPS apps 25 + full visual 15/30 - vision tier pending"
+  }
+}

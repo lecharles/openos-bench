@@ -54,10 +54,32 @@ The Hermes 10-check crosscheck initially read 6/10 on K3.1. Diagnosis (targeted 
 
 ## Failed / didn't
 
-- **Typed-text persistence fails reload** (layout-only) - the board's recurring Moonshot-era red axis now spans K2.7 and K3.1
+- **Typed-text persistence fails reload** (layout-only) - the board's recurring Moonshot-era red axis now spans K2.7 and K3.1 - **superseded by the Nov 27 revalidation below: reds did not reproduce on fresh-state boots (2/2 green)**
 - **Click-path drag probe red** (`moved=false`) while the same step is green on other 72-tier runs - see Worked note; adjudicating instrument-vs-handler needs the operator pass
 - 404 instead of spec-mandated 403 on path-allowlist probes
 - One dock app never opened a window in click sweep (12/13)
+
+## Nov 27 revalidation sweep (publish cron, no new build today)
+
+The 05+ GLM-5.4 slot went blocked at fire time (probe: "glm-5.4 isn't included in OpenCode Go", 17:10 PT), so today is a revalidation day for run 05. Five Tier-1 samples now exist across three instrument sessions (all `(struct)` unless noted):
+
+| Sample | Boot state | Struct /100 | Spotlight-launch probe | Typed-text survives | Neutral harness |
+|---|---|---|---|---|---|
+| Nov 26 publish (committed) | post-harness debris (1,564 nodes) | 88 | green | red | 8/8 |
+| Nov 26 publish-cron confirm | loopback 3105 | 88 (rep.) | green | red | 8/8 (rep.) |
+| Nov 27 morning train (31005) | rundir boot (925 nodes) | - | - | - | **8/8** |
+| Nov 27 cron confirm | state-debris boot (1,564 nodes) | 80 | **red** | red | 8/8 |
+| Nov 27 reval A (fresh state) | 610 nodes | **92** | green | **green** | - |
+| Nov 27 reval B (fresh state) | 736 nodes | 84 | **red** | **green** | - |
+
+**Rulings, with the diff-note rule honored (headline stays 88, the mid-band value):**
+
+1. **`6-spotlight-launch` is a flapping probe on this build** - green/red across identical fresh boots (2/4 overall). The frame-diff step cannot distinguish Enter-launch from Enter-noop when the target window exists anywhere in z-order; combined with pre-rendered `section.window` nodes (see instrument note), this is a tier-1 instrument gap, filed for the clickpath backlog. Score band disclosed: **88 (prov.), 80-92 observed spread, launch-step flake is the whole delta**.
+2. **Typed-text persistence red is retracted for K3.1.** Both clean fresh-state boots survive reload 2/2; every red came from a boot whose `data/state.json` carried leftover open windows from a prior instrument session. The board-wide "all Moonshot-era runs fail typed-text" axis now reads K2.7 only, with K3.1 green on the structural tier - other rows' claims were made under the same debris conditions and should be rechecked at their next revalidation.
+3. **The neutral harness is rock-solid**: 8/8 five boots in a row across two days and two ports - the second clean sweep stands.
+4. **Infra findings** (fixed same day): morning-train finish-branch arithmetic crashed on the "05+" roster row (`$((10#05+))`), and the train's raw-rundir boot (model binds 0.0.0.0) sat **exposed on port 31005 for ~9 hours** before this sweep killed it and patched `train.sh`: run-number sanitizing, correct `3100+n` port math, and a post-scoring teardown of the port listener.
+
+Evidence: `eval/harness/results/run-05-kimi-1127-train/` · `.../run-05-kimi-k3.1/{confirm-1127-harnessjs,confirm-1127-clickpath,reval-1127-freshA,reval-1127-freshB}/`
 
 ## Evidence
 
